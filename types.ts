@@ -1,0 +1,102 @@
+export type Language = 'pt' | 'en';
+
+export interface FinancialData {
+  companyName: string;
+  companyAddress?: string;
+  year: string;
+  prevYear: string;
+  reportDate: string;
+  directorName: string;
+  accountantName: string;
+  crcNumber: string;
+  showPrevYear: boolean;
+  
+  // Balance Sheet - Assets
+  assetCashCurrent: number;
+  assetCashPrev: number;
+  assetLoansCurrent: number;
+  assetLoansPrev: number;
+  assetInvestmentsCurrent: number;
+  assetInvestmentsPrev: number;
+  assetTangibleCurrent: number;
+  assetTangiblePrev: number;
+  assetIntangibleCurrent: number;
+  assetIntangiblePrev: number;
+  assetOtherCurrent: number;
+  assetOtherPrev: number;
+  
+  // Balance Sheet - Liabilities
+  liabilityPayablesCurrent: number;
+  liabilityPayablesPrev: number;
+  liabilityLongTermCurrent: number;
+  liabilityLongTermPrev: number;
+  liabilityOtherCurrent: number;
+  liabilityOtherPrev: number;
+
+  // Balance Sheet - Equity
+  equityTotalCurrent: number;
+  equityTotalPrev: number;
+  
+  // Income Statement
+  dreRevenueCurrent: number;
+  dreRevenuePrev: number;
+  dreCostOfSalesCurrent: number;
+  dreCostOfSalesPrev: number;
+  
+  dreOperatingExpensesCurrent: number;
+  dreOperatingExpensesPrev: number;
+  dreOtherExpensesCurrent: number;
+  dreOtherExpensesPrev: number;
+  dreIncomeTaxCurrent: number;
+  dreIncomeTaxPrev: number;
+}
+
+export const INITIAL_DATA: FinancialData = {
+  companyName: "Sua Empresa Ltda",
+  companyAddress: "",
+  year: "2024",
+  prevYear: "2023",
+  reportDate: "31 de Dezembro de 2024",
+  directorName: "Nome do Diretor",
+  accountantName: "Alexandre Luis Flach",
+  crcNumber: "RS-062558/O-8",
+  showPrevYear: true,
+  
+  // Assets
+  assetCashCurrent: 0,
+  assetCashPrev: 0,
+  assetLoansCurrent: 0,
+  assetLoansPrev: 0,
+  assetInvestmentsCurrent: 0,
+  assetInvestmentsPrev: 0,
+  assetTangibleCurrent: 0,
+  assetTangiblePrev: 0,
+  assetIntangibleCurrent: 0,
+  assetIntangiblePrev: 0,
+  assetOtherCurrent: 0,
+  assetOtherPrev: 0,
+  
+  // Liabilities
+  liabilityPayablesCurrent: 0,
+  liabilityPayablesPrev: 0,
+  liabilityLongTermCurrent: 0,
+  liabilityLongTermPrev: 0,
+  liabilityOtherCurrent: 0,
+  liabilityOtherPrev: 0,
+
+  // Equity
+  equityTotalCurrent: 0,
+  equityTotalPrev: 0,
+  
+  // Income Statement
+  dreRevenueCurrent: 0,
+  dreRevenuePrev: 0,
+  dreCostOfSalesCurrent: 0,
+  dreCostOfSalesPrev: 0,
+  dreOperatingExpensesCurrent: 0,
+  dreOperatingExpensesPrev: 0,
+  dreOtherExpensesCurrent: 0,
+  dreOtherExpensesPrev: 0,
+  dreIncomeTaxCurrent: 0,
+  dreIncomeTaxPrev: 0,
+};
