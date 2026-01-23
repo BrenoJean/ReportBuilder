@@ -1,12 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 import { FinancialData, Language } from "../types";
 
-export const generateFinancialInsights = async (data: FinancialData, language: Language): Promise<string> => {
-  if (!process.env.API_KEY) {
+export const generateFinancialInsights = async (
+  data: FinancialData,
+  language: Language
+): Promise<string> => {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+
+  if (!apiKey) {
     throw new Error("API Key is missing. Please check your settings.");
   }
 
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey });
   
   const languageInstruction = language === 'pt' 
     ? "O texto DEVE ser escrito em Português do Brasil." 
