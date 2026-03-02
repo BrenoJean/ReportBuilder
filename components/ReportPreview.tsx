@@ -217,19 +217,34 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
         <h3 className="text-lg font-bold uppercase text-gray-600 mb-8">{t.toc}</h3>
 
         <div className="space-y-4 text-sm">
-          {[
-            { id: 1, title: t.accReport, page: 3 },
-            { id: 2, title: t.finPos, page: 4 },
-            { id: 3, title: t.compIncome, page: 5 },
-            { id: 4, title: t.changesEquity, page: 6 },
-            { id: 5, title: t.notes, page: 7 },
-            ...(printInsights && insights ? [{ id: 6, title: t.aiInsights, page: 8 }] : [])
-          ].map((item) => (
-            <div key={item.id} className="flex justify-between items-center bg-gray-100 p-2">
-              <span>{item.id}. {item.title}</span>
-              <span className="font-bold">{item.page}</span>
-            </div>
-          ))}
+  {[
+    { id: 1, title: t.accReport, page: 3 },
+    { id: 2, title: t.finPos, page: 4 },
+    { id: 3, title: t.compIncome, page: 5 },
+    // item único juntando Notas + Insights
+    ...(printInsights && insights
+      ? [
+          {
+            id: 4,
+            title:
+              language === "pt"
+                ? `${t.notes} e ${t.aiInsights}`
+                : `${t.notes} and ${t.aiInsights}`,
+            page: 6,
+          },
+        ]
+      : []),
+  ].map((item) => (
+    <div
+      key={item.id}
+      className="flex justify-between items-center bg-gray-100 p-2"
+    >
+      <span>
+        {item.id}. {item.title}
+      </span>
+      <span className="font-bold">{item.page}</span>
+    </div>
+  ))}
         </div>
       </div>
 
