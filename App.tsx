@@ -4,8 +4,10 @@ import { FinancialData, INITIAL_DATA, Language } from './types';
 import { InputForm } from './components/InputForm';
 import { ReportPreview } from './components/ReportPreview';
 import { generateFinancialInsights } from './services/geminiService';
+import { Login } from '.components/Login';
 
 const App: React.FC = () => {
+  const [logged, setLogged] = useState(false);
   const [data, setData] = useState<FinancialData>(INITIAL_DATA);
   const [language, setLanguage] = useState<Language>('pt');
   const [insights, setInsights] = useState<string | null>(null);
@@ -34,6 +36,10 @@ const App: React.FC = () => {
     window.print();
   };
 
+    if (!logged) {
+    return <Login onSuccess={() => setLogged(true)} />;
+  }
+  
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col print:bg-white print:h-auto">
       {/* Header - Hidden on Print */}
