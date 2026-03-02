@@ -1,16 +1,17 @@
 // api/generate-insights.ts
-import { GoogleGenAI } from "@google/genai";
+// Serverless function da Vercel usando Groq (LLaMA 3.3 70B)
 
-// Handler da API na Vercel
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+
 export default async function handler(req: any, res: any) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: "Missing GEMINI_API_KEY env var" });
+    return res.status(500).json({ error: "Missing GROQ_API_KEY env var" });
   }
 
   // Em algumas versões o body vem string, em outras objeto
@@ -23,14 +24,12 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
-
     const languageInstruction =
       language === "pt"
         ? "O texto DEVE ser escrito em Português do Brasil."
         : "The text MUST be written in English (Formal Business English).";
 
-    // Totais para contexto
+    // Totais para contexto da análise
     const totalAssetsCurrent =
       data.assetCashCurrent +
       data.assetLoansCurrent +
@@ -83,38 +82,57 @@ Dados DRE (em USD):
 - Lucro Líquido: ${netIncomeCurrent}
 
 Gere 3 parágrafos concisos e profissionais de "Notas da Administração" ou "Insights Financeiros" para serem incluídos no relatório anual.
-Foque em:
-- liquidez
-- rentabilidade
-- variação patrimonial entre ${data.prevYear} e ${data.year}.
-
+Foque em liquidez, rentabilidade e variação patrimonial entre ${data.prevYear} e ${data.year}.
 Use um tom formal. Não use markdown, apenas texto puro separado por parágrafos.
 
 ${languageInstruction}
     `;
 
-    // 🔹 Chamada real ao Gemini
-    const result = await ai.models.generateContent({
-      model: "gemini-2.0-flash", // ou o modelo que você estiver usando
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: prompt }],
-        },
-      ],
+    // Chamada à Groq (API compatível com OpenAI)
+    const groqResponse = await fetch(GROQ_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content:
+              "Você é um analista financeiro sênior especializado em relatórios contábeis e análise de demonstrações financeiras.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      }),
     });
 
+    if (!groqResponse.ok) {
+      const errorBody = await groqResponse.text();
+      console.error("Groq API error:", groqResponse.status, errorBody);
+      return res.status(500).json({
+        error:
+          language === "pt"
+            ? `Erro ao conectar com a IA (Groq): ${errorBody}`
+            : `Error connecting to AI (Groq): ${errorBody}`,
+      });
+    }
+
+    const json = await groqResponse.json();
+
     const text =
-      // @ts-ignore – dependendo da lib, a resposta muda levemente
-      result.response?.text?.() ||
+      json.choices?.[0]?.message?.content ||
       (language === "pt"
         ? "Não foi possível gerar insights no momento."
         : "Could not generate insights at this time.");
 
-    // 🔹 DEVOLVE a resposta para o front
     return res.status(200).json({ text });
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
+    console.error("Groq API Exception:", error);
     return res.status(500).json({
       error:
         language === "pt"
