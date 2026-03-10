@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Keep Gestão Contábil Report</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -11,26 +16,35 @@
           extend: {
             colors: {
               keep: {
-                900: '#000000', // Changed to black/darkest gray
+                900: '#000000',
               }
             },
             screens: {
-              'print': {'raw': 'print'},
+              'print': { 'raw': 'print' },
             }
           }
         }
       }
     </script>
+
     <style>
+      body {
+        font-family: 'Roboto', Arial, sans-serif;
+        font-variant-numeric: tabular-nums;
+      }
+
       @media print {
         @page { margin: 0; size: A4; }
         body { -webkit-print-color-adjust: exact; }
         .no-print { display: none !important; }
         .page-break { break-after: page; }
         .print-container { width: 100%; margin: 0; padding: 0; }
-        /* Ensure background colors print */
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
       }
+
       .a4-page {
         width: 210mm;
         min-height: 297mm;
@@ -40,6 +54,7 @@
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
         position: relative;
       }
+
       @media print {
         .a4-page {
           width: 100%;
@@ -49,26 +64,30 @@
           box-shadow: none;
           page-break-after: always;
         }
+
         .a4-page:last-child {
           page-break-after: auto;
         }
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "vite": "https://esm.sh/vite@^7.3.1",
-    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
-  <body class="bg-gray-100 text-gray-800">
+
+    <script type="importmap">
+      {
+        "imports": {
+          "vite": "https://esm.sh/vite@^7.3.1",
+          "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+          "react/": "https://esm.sh/react@^19.2.3/",
+          "react": "https://esm.sh/react@^19.2.3",
+          "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+          "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
+        }
+      }
+    </script>
+
+    <link rel="stylesheet" href="/index.css">
+  </head>
+
+  <body class="bg-gray-100 text-gray-800 tabular-nums">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
