@@ -184,7 +184,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
   );
 
   return (
-    <div className="print-container font-serif text-black leading-snug">
+    <div className="print-container font-sans tabular-nums text-black leading-normal">
       
       {/* PAGE 1: COVER */}
       <div className="a4-page flex flex-col justify-between items-center text-center">
