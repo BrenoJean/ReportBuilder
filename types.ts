@@ -54,9 +54,9 @@ export interface FinancialData {
 export const INITIAL_DATA: FinancialData = {
   companyName: "Sua Empresa Ltda",
   companyAddress: "",
-  year: "2024",
-  prevYear: "2023",
-  reportDate: "31 de Dezembro de 2024",
+  year: "2025",
+  prevYear: "2024",
+  reportDate: "31 de Dezembro de 2025",
   directorName: "Nome do Diretor",
   accountantName: "Alexandre Luis Flach",
   crcNumber: "RS-062558/O-8",
