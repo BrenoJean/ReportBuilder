@@ -14,8 +14,35 @@ const App: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [printInsights, setPrintInsights] = useState(false);
 
-  const handleDataChange = (field: keyof FinancialData, value: string | number) => {
-    setData(prev => ({ ...prev, [field]: value }));
+  const handleDataChange = (field: keyof FinancialData, value: string | number | boolean) => {
+    setData(prev => {
+      const next = { ...prev, [field]: value } as FinancialData;
+
+      const equityAnalyticalCurrentSum =
+        next.equityCapitalSocialCurrent +
+        next.equityRetainedEarningsUntil2023Current +
+        next.equityRetainedEarnings2024Current +
+        next.equityRetainedEarnings2025Current;
+
+      const equityAnalyticalPrevSum =
+        next.equityCapitalSocialPrev +
+        next.equityRetainedEarningsUntil2023Prev +
+        next.equityRetainedEarnings2024Prev +
+        next.equityRetainedEarnings2025Prev;
+
+      const hasCurrentAnalyticalValues = equityAnalyticalCurrentSum !== 0;
+      const hasPrevAnalyticalValues = equityAnalyticalPrevSum !== 0;
+
+      if (hasCurrentAnalyticalValues) {
+        next.equityTotalCurrent = equityAnalyticalCurrentSum;
+      }
+
+      if (hasPrevAnalyticalValues) {
+        next.equityTotalPrev = equityAnalyticalPrevSum;
+      }
+
+      return next;
+    });
   };
 
   const handleGenerateInsights = async () => {

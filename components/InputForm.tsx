@@ -31,6 +31,20 @@ export const InputForm: React.FC<InputFormProps> = ({
     );
   };
 
+  const hasCurrentAnalyticalValues =
+    data.equityCapitalSocialCurrent +
+      data.equityRetainedEarningsUntil2023Current +
+      data.equityRetainedEarnings2024Current +
+      data.equityRetainedEarnings2025Current !==
+    0;
+
+  const hasPrevAnalyticalValues =
+    data.equityCapitalSocialPrev +
+      data.equityRetainedEarningsUntil2023Prev +
+      data.equityRetainedEarnings2024Prev +
+      data.equityRetainedEarnings2025Prev !==
+    0;
+
   return (
     <div className="bg-white p-6 shadow-lg rounded-lg h-full overflow-y-auto">
       <div className="border-b pb-4 mb-4 flex justify-between items-center">
@@ -160,8 +174,42 @@ export const InputForm: React.FC<InputFormProps> = ({
           <input type="number" name="liabilityOtherPrev" placeholder="Anterior" value={data.liabilityOtherPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Patrimônio Líquido (Shareholder's Equity)</label>
-          <input type="number" name="equityTotalCurrent" placeholder="Atual" value={data.equityTotalCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="equityTotalPrev" placeholder="Anterior" value={data.equityTotalPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
+          <label className="block text-sm col-span-2 pl-2">Capital Social</label>
+          <input type="number" name="equityCapitalSocialCurrent" placeholder="Atual" value={data.equityCapitalSocialCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="equityCapitalSocialPrev" placeholder="Anterior" value={data.equityCapitalSocialPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
+          <label className="block text-sm col-span-2 pl-2">Lucros e Prejuízos até 2023</label>
+          <input type="number" name="equityRetainedEarningsUntil2023Current" placeholder="Atual" value={data.equityRetainedEarningsUntil2023Current} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="equityRetainedEarningsUntil2023Prev" placeholder="Anterior" value={data.equityRetainedEarningsUntil2023Prev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
+          <label className="block text-sm col-span-2 pl-2">Lucros e Prejuízos 2024</label>
+          <input type="number" name="equityRetainedEarnings2024Current" placeholder="Atual" value={data.equityRetainedEarnings2024Current} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="equityRetainedEarnings2024Prev" placeholder="Anterior" value={data.equityRetainedEarnings2024Prev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
+          <label className="block text-sm col-span-2 pl-2">Lucros e Prejuízos 2025</label>
+          <input type="number" name="equityRetainedEarnings2025Current" placeholder="Atual" value={data.equityRetainedEarnings2025Current} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="equityRetainedEarnings2025Prev" placeholder="Anterior" value={data.equityRetainedEarnings2025Prev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
+          <label className="block text-sm font-bold col-span-2 pl-2">Total do Patrimônio Líquido</label>
+          <input
+            type="number"
+            name="equityTotalCurrent"
+            placeholder="Atual"
+            value={data.equityTotalCurrent}
+            onChange={handleChange}
+            disabled={hasCurrentAnalyticalValues}
+            className={`block w-full border border-gray-300 rounded px-2 py-1 text-sm ${hasCurrentAnalyticalValues ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+          />
+          <input
+            type="number"
+            name="equityTotalPrev"
+            placeholder="Anterior"
+            value={data.equityTotalPrev}
+            onChange={handleChange}
+            disabled={hasPrevAnalyticalValues}
+            className={`block w-full border border-gray-300 rounded px-2 py-1 text-sm ${hasPrevAnalyticalValues ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+          />
         </div>
       </div>
 
