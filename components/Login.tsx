@@ -12,7 +12,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
   // Usuários/senhas permitidos
   const allowed = [
     { user: "jean", pass: "123" },
-    { user: "keep", pass: "2024" },
+    { user: "keep", pass: "2025" },
     { user: "demo", pass: "demo" },
   ];
 
