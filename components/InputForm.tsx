@@ -210,6 +210,8 @@ export const InputForm: React.FC<InputFormProps> = ({
             disabled={hasPrevAnalyticalValues}
             className={`block w-full border border-gray-300 rounded px-2 py-1 text-sm ${hasPrevAnalyticalValues ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
           />
+          <input type="number" name="equityTotalCurrent" placeholder="Atual" value={data.equityTotalCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="equityTotalPrev" placeholder="Anterior" value={data.equityTotalPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
         </div>
       </div>
 
