@@ -34,6 +34,14 @@ export interface FinancialData {
   liabilityOtherPrev: number;
 
   // Balance Sheet - Equity
+  equityCapitalSocialCurrent: number;
+  equityCapitalSocialPrev: number;
+  equityRetainedEarningsUntil2023Current: number;
+  equityRetainedEarningsUntil2023Prev: number;
+  equityRetainedEarnings2024Current: number;
+  equityRetainedEarnings2024Prev: number;
+  equityRetainedEarnings2025Current: number;
+  equityRetainedEarnings2025Prev: number;
   equityTotalCurrent: number;
   equityTotalPrev: number;
   
@@ -85,6 +93,14 @@ export const INITIAL_DATA: FinancialData = {
   liabilityOtherPrev: 0,
 
   // Equity
+  equityCapitalSocialCurrent: 0,
+  equityCapitalSocialPrev: 0,
+  equityRetainedEarningsUntil2023Current: 0,
+  equityRetainedEarningsUntil2023Prev: 0,
+  equityRetainedEarnings2024Current: 0,
+  equityRetainedEarnings2024Prev: 0,
+  equityRetainedEarnings2025Current: 0,
+  equityRetainedEarnings2025Prev: 0,
   equityTotalCurrent: 0,
   equityTotalPrev: 0,
   

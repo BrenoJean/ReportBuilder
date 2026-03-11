@@ -41,6 +41,10 @@ const translations = {
     totalLiabilities: "TOTAL LIABILITIES",
     
     shareholderEquity: "SHAREHOLDER'S EQUITY",
+    capitalSocial: "Share Capital",
+    retainedEarningsUntil2023: "Profits and losses until 2023",
+    retainedEarnings2024: "Profits and losses 2024",
+    retainedEarnings2025: "Profits and losses 2025",
 
     // Income Statement Labels
     revenue: "REVENUE",
@@ -96,6 +100,10 @@ const translations = {
     totalLiabilities: "TOTAL DO PASSIVO",
     
     shareholderEquity: "PATRIMÔNIO LÍQUIDO",
+    capitalSocial: "Capital Social",
+    retainedEarningsUntil2023: "Lucros e prejuízos até 2023",
+    retainedEarnings2024: "Lucros e prejuízos 2024",
+    retainedEarnings2025: "Lucros e prejuízos 2025",
 
     // Income Statement Labels
     revenue: "RECEITA",
@@ -167,6 +175,11 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
 
   const netIncomeCurrent = grossProfitCurrent - totalExpensesCurrent;
   const netIncomePrev = grossProfitPrev - totalExpensesPrev;
+
+  const shouldShowCapitalSocial = data.equityCapitalSocialCurrent !== 0 || data.equityCapitalSocialPrev !== 0;
+  const shouldShowRetainedEarningsUntil2023 = data.equityRetainedEarningsUntil2023Current !== 0 || data.equityRetainedEarningsUntil2023Prev !== 0;
+  const shouldShowRetainedEarnings2024 = data.equityRetainedEarnings2024Current !== 0 || data.equityRetainedEarnings2024Prev !== 0;
+  const shouldShowRetainedEarnings2025 = data.equityRetainedEarnings2025Current !== 0 || data.equityRetainedEarnings2025Prev !== 0;
 
   // Footer Component
   const Footer = () => (
@@ -367,7 +380,35 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
             <tr>
               <td className="pt-6 font-bold" colSpan={data.showPrevYear ? 3 : 2}>{t.shareholderEquity}</td>
             </tr>
-             <tr className="border-t-2 border-black border-b-2 font-bold bg-gray-100">
+            {shouldShowCapitalSocial && (
+              <tr>
+                <td className="py-1 pl-4">{t.capitalSocial}</td>
+                <td className="text-right">{formatCurrency(data.equityCapitalSocialCurrent)}</td>
+                {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityCapitalSocialPrev)}</td>}
+              </tr>
+            )}
+            {shouldShowRetainedEarningsUntil2023 && (
+              <tr>
+                <td className="py-1 pl-4">{t.retainedEarningsUntil2023}</td>
+                <td className="text-right">{formatCurrency(data.equityRetainedEarningsUntil2023Current)}</td>
+                {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityRetainedEarningsUntil2023Prev)}</td>}
+              </tr>
+            )}
+            {shouldShowRetainedEarnings2024 && (
+              <tr>
+                <td className="py-1 pl-4">{t.retainedEarnings2024}</td>
+                <td className="text-right">{formatCurrency(data.equityRetainedEarnings2024Current)}</td>
+                {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityRetainedEarnings2024Prev)}</td>}
+              </tr>
+            )}
+            {shouldShowRetainedEarnings2025 && (
+              <tr>
+                <td className="py-1 pl-4">{t.retainedEarnings2025}</td>
+                <td className="text-right">{formatCurrency(data.equityRetainedEarnings2025Current)}</td>
+                {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityRetainedEarnings2025Prev)}</td>}
+              </tr>
+            )}
+            <tr className="border-t-2 border-black border-b-2 font-bold bg-gray-100">
               <td className="py-2">{t.shareholderEquity}</td>
               <td className="text-right py-2">{formatCurrency(data.equityTotalCurrent)}</td>
               {data.showPrevYear && <td className="text-right py-2">{formatCurrency(data.equityTotalPrev)}</td>}
