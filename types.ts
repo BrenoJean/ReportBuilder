@@ -10,6 +10,8 @@ export interface FinancialData {
   accountantName: string;
   crcNumber: string;
   showPrevYear: boolean;
+  aiScenario: 'none' | 'new_company' | 'closing_company' | 'other';
+  aiContextNotes: string;
   
   // Balance Sheet - Assets
   assetCashCurrent: number;
@@ -69,6 +71,8 @@ export const INITIAL_DATA: FinancialData = {
   accountantName: "Alexandre Luis Flach",
   crcNumber: "RS-062558/O-8",
   showPrevYear: true,
+  aiScenario: 'none',
+  aiContextNotes: '',
   
   // Assets
   assetCashCurrent: 0,

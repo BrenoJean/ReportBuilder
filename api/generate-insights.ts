@@ -6,6 +6,48 @@ const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const fmt = (value: number) =>
   new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0));
 
+const hasComparablePreviousYear = (data: any) => {
+  if (!data?.showPrevYear) return false;
+
+  const previousYearFields = [
+    data.assetCashPrev,
+    data.assetLoansPrev,
+    data.assetInvestmentsPrev,
+    data.assetTangiblePrev,
+    data.assetIntangiblePrev,
+    data.assetOtherPrev,
+    data.liabilityPayablesPrev,
+    data.liabilityLongTermPrev,
+    data.liabilityOtherPrev,
+    data.equityCapitalSocialPrev,
+    data.equityRetainedEarningsUntil2023Prev,
+    data.equityRetainedEarnings2024Prev,
+    data.equityRetainedEarnings2025Prev,
+    data.equityTotalPrev,
+    data.dreRevenuePrev,
+    data.dreCostOfSalesPrev,
+    data.dreOperatingExpensesPrev,
+    data.dreOtherExpensesPrev,
+    data.dreIncomeTaxPrev,
+  ];
+
+  return previousYearFields.some((value) => Number(value || 0) !== 0);
+};
+
+const getScenarioInstruction = (scenario: string, language: string) => {
+  if (language === "pt") {
+    if (scenario === "new_company") return "Contexto declarado: empresa constituída no ano atual.";
+    if (scenario === "closing_company") return "Contexto declarado: empresa encerrou atividades no ano corrente.";
+    if (scenario === "other") return "Contexto declarado: há observações adicionais relevantes para leitura dos dados.";
+    return "";
+  }
+
+  if (scenario === "new_company") return "Declared context: company was incorporated in the current year.";
+  if (scenario === "closing_company") return "Declared context: company ceased operations in the current year.";
+  if (scenario === "other") return "Declared context: there are additional relevant notes for interpreting the data.";
+  return "";
+};
+
 export default async function handler(req: any, res: any) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -25,6 +67,10 @@ export default async function handler(req: any, res: any) {
   if (!data || !language) {
     return res.status(400).json({ error: "Missing data or language" });
   }
+
+  const hasPreviousYearData = hasComparablePreviousYear(data);
+  const scenarioInstruction = getScenarioInstruction(data.aiScenario || "none", language);
+  const additionalContext = String(data.aiContextNotes || "").trim();
 
   try {
     const languageInstruction =
@@ -108,7 +154,7 @@ export default async function handler(req: any, res: any) {
     const prompt = `
 Atue como analista financeiro sênior da Keep Gestão Contábil.
 
-Tarefa: produzir 3 parágrafos de insights financeiros para ${data.companyName}, comparando ${data.prevYear} vs ${data.year}.
+Tarefa: produzir 3 parágrafos de insights financeiros para ${data.companyName}, sobre o ano ${data.year}${hasPreviousYearData ? ` e comparando com ${data.prevYear}` : ''}.
 
 REGRAS OBRIGATÓRIAS (não descumprir):
 1) Use SOMENTE os números do dataset abaixo. Não invente valores, percentuais, causas, tendências ou contexto externo.
@@ -118,6 +164,7 @@ REGRAS OBRIGATÓRIAS (não descumprir):
 5) Não afirmar ausência total de passivos, crescimento patrimonial, reinvestimento, liquidez confortável ou qualquer conclusão qualitativa sem suporte numérico explícito.
 6) Cite números com 2 casas decimais.
 7) Não use markdown, listas ou títulos. Apenas texto corrido em 3 parágrafos.
+8) ${hasPreviousYearData ? `Há dados válidos para ${data.prevYear}; comparações são permitidas quando sustentadas.` : `Não há base comparativa válida de ano anterior. NÃO faça comparações com ${data.prevYear}, NÃO fale em variação percentual e foque exclusivamente no desempenho e estrutura de ${data.year}.`}
 
 Resumo numérico rápido (USD):
 - Ativos totais: ${fmt(totalAssetsCurrent)} (anterior: ${fmt(totalAssetsPrev)})
@@ -128,6 +175,10 @@ Resumo numérico rápido (USD):
 
 Dataset completo (JSON):
 ${JSON.stringify(dataset)}
+
+Contexto adicional informado pelo usuário:
+- Cenário: ${scenarioInstruction || (language === "pt" ? "não informado" : "not provided")}
+- Observações: ${additionalContext || (language === "pt" ? "nenhuma" : "none")}
 
 ${languageInstruction}
     `;

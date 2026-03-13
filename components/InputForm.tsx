@@ -23,7 +23,7 @@ export const InputForm: React.FC<InputFormProps> = ({
   setPrintInsights
 }) => {
   
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type, checked } = e.target;
     onChange(
       name as keyof FinancialData, 
@@ -248,6 +248,35 @@ export const InputForm: React.FC<InputFormProps> = ({
           Inteligência Artificial (Gemini)
         </h3>
         <p className="text-xs text-gray-600 mb-3">Gerar análise financeira automática ({language === 'pt' ? 'Português' : 'English'}).</p>
+
+        <div className="space-y-2 mb-3">
+          <label className="block text-xs font-semibold text-gray-700">
+            Contexto para IA
+            <select
+              name="aiScenario"
+              value={data.aiScenario}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded px-2 py-1 text-sm"
+            >
+              <option value="none">Sem observação específica</option>
+              <option value="new_company">Empresa constituída no ano atual</option>
+              <option value="closing_company">Empresa encerrou atividades no ano corrente</option>
+              <option value="other">Outro contexto</option>
+            </select>
+          </label>
+
+          <label className="block text-xs font-semibold text-gray-700">
+            Observações adicionais (opcional)
+            <textarea
+              name="aiContextNotes"
+              value={data.aiContextNotes}
+              onChange={(e) => onChange('aiContextNotes', e.target.value)}
+              rows={3}
+              placeholder="Ex: primeiro exercício operacional completo, operação encerrada em novembro etc."
+              className="mt-1 block w-full border border-gray-300 rounded px-2 py-1 text-sm"
+            />
+          </label>
+        </div>
         
         <button 
           onClick={onGenerateInsights}
