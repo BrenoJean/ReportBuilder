@@ -390,6 +390,13 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
                 {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityCapitalSocialPrev)}</td>}
               </tr>
             )}
+            {shouldShowProfitReserve && (
+              <tr>
+                <td className="py-1 pl-4">{t.profitReserve}</td>
+                <td className="text-right">{formatCurrency(data.equityProfitReserveCurrent)}</td>
+                {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityProfitReservePrev)}</td>}
+              </tr>
+            )}
             {shouldShowRetainedEarningsUntil2023 && (
               <tr>
                 <td className="py-1 pl-4">{t.retainedEarningsUntil2023}</td>
@@ -409,13 +416,6 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
                 <td className="py-1 pl-4">{t.retainedEarnings2025}</td>
                 <td className="text-right">{formatCurrency(data.equityRetainedEarnings2025Current)}</td>
                 {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityRetainedEarnings2025Prev)}</td>}
-              </tr>
-            )}
-            {shouldShowProfitReserve && (
-              <tr>
-                <td className="py-1 pl-4">{t.profitReserve}</td>
-                <td className="text-right">{formatCurrency(data.equityProfitReserveCurrent)}</td>
-                {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityProfitReservePrev)}</td>}
               </tr>
             )}
             <tr className="border-t-2 border-black border-b-2 font-bold bg-gray-100">
