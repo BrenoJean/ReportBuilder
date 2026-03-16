@@ -23,10 +23,10 @@ const normalizeCompanyName = (input: string) =>
     .slice(0, 80) || 'empresa-sem-nome';
 
 const getBlobToken = () => {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const token = process.env.REPORTBLOB_READ_WRITE_TOKEN;
 
   if (!token) {
-    throw new Error('Variável BLOB_READ_WRITE_TOKEN não configurada neste ambiente (Preview/Production).');
+    throw new Error('Variável REPORTBLOB_READ_WRITE_TOKEN não configurada neste ambiente (Preview/Production).');
   }
 
   return token;
