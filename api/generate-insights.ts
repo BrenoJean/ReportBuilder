@@ -23,6 +23,7 @@ const hasComparablePreviousYear = (data: any) => {
     data.equityRetainedEarningsUntil2023Prev,
     data.equityRetainedEarnings2024Prev,
     data.equityRetainedEarnings2025Prev,
+    data.equityProfitReservePrev,
     data.equityTotalPrev,
     data.dreRevenuePrev,
     data.dreCostOfSalesPrev,
