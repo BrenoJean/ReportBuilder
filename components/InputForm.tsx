@@ -10,11 +10,7 @@ interface InputFormProps {
   isGenerating: boolean;
   printInsights: boolean;
   setPrintInsights: (val: boolean) => void;
-  savedCompanies: Array<{ key: string; companyName: string; latestSavedAt: string }>;
-  selectedCompanyKey: string;
-  setSelectedCompanyKey: (key: string) => void;
   onSaveToBlob: () => void;
-  onLoadFromBlob: () => void;
   isPersisting: boolean;
 }
 
@@ -27,11 +23,7 @@ export const InputForm: React.FC<InputFormProps> = ({
   isGenerating,
   printInsights,
   setPrintInsights,
-  savedCompanies,
-  selectedCompanyKey,
-  setSelectedCompanyKey,
   onSaveToBlob,
-  onLoadFromBlob,
   isPersisting
 }) => {
   
@@ -84,46 +76,6 @@ export const InputForm: React.FC<InputFormProps> = ({
         </div>
       </div>
 
-      {/* Persistência no Blob */}
-      <div className="mb-6 bg-blue-50 p-3 rounded border border-blue-200 space-y-2">
-        <h3 className="font-semibold text-sm text-blue-900">Salvar / Importar JSON (Vercel Blob)</h3>
-        <p className="text-xs text-blue-800">Os dados são salvos com versão de schema para acompanhar evolução do Report Builder.</p>
-
-        <label className="block text-xs font-semibold text-blue-900">
-          Empresa salva
-          <select
-            value={selectedCompanyKey}
-            onChange={(e) => setSelectedCompanyKey(e.target.value)}
-            className="mt-1 block w-full border border-blue-300 rounded px-2 py-1 text-sm"
-          >
-            <option value="">Selecione...</option>
-            {savedCompanies.map((company) => (
-              <option key={company.key} value={company.key}>
-                {company.companyName} ({new Date(company.latestSavedAt).toLocaleDateString('pt-BR')})
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={onSaveToBlob}
-            disabled={isPersisting}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm disabled:opacity-60"
-          >
-            {isPersisting ? 'Salvando...' : 'Salvar JSON'}
-          </button>
-          <button
-            type="button"
-            onClick={onLoadFromBlob}
-            disabled={isPersisting || !selectedCompanyKey}
-            className="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded text-sm disabled:opacity-60"
-          >
-            {isPersisting ? 'Importando...' : 'Importar JSON'}
-          </button>
-        </div>
-      </div>
       
       {/* Dados Gerais */}
       <div className="space-y-4 mb-6">
@@ -297,6 +249,21 @@ export const InputForm: React.FC<InputFormProps> = ({
           <input type="number" name="dreIncomeTaxCurrent" placeholder="Atual" value={data.dreIncomeTaxCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
           <input type="number" name="dreIncomeTaxPrev" placeholder="Anterior" value={data.dreIncomeTaxPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
         </div>
+      </div>
+
+      {/* Salvar empresa */}
+      <div className="mb-6 bg-blue-50 p-3 rounded border border-blue-200 space-y-2">
+        <h3 className="font-semibold text-sm text-blue-900">Salvar empresa</h3>
+        <p className="text-xs text-blue-800">Salva os dados preenchidos da empresa para reutilizar depois.</p>
+
+        <button
+          type="button"
+          onClick={onSaveToBlob}
+          disabled={isPersisting}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm disabled:opacity-60"
+        >
+          {isPersisting ? 'Salvando...' : 'Salvar empresa'}
+        </button>
       </div>
 
       {/* IA Section */}
