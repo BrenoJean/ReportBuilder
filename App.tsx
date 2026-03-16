@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { FinancialData, INITIAL_DATA, Language } from './types';
 import { InputForm } from './components/InputForm';
 import { ReportPreview } from './components/ReportPreview';
 import { generateFinancialInsights } from './services/geminiService';
 import Login from "./components/Login"; // ✅ import correto
+import { listSavedCompanies, loadCompanyReport, saveCompanyReport, SavedCompanyEntry } from './services/blobReportService';
 
 const buildReportDate = (lang: Language, year: string) => {
   if (lang === 'en') {
@@ -21,6 +22,18 @@ const App: React.FC = () => {
   const [insights, setInsights] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [printInsights, setPrintInsights] = useState(false);
+  const [savedCompanies, setSavedCompanies] = useState<SavedCompanyEntry[]>([]);
+  const [selectedCompanyKey, setSelectedCompanyKey] = useState('');
+  const [isPersisting, setIsPersisting] = useState(false);
+
+  const getErrorMessage = (error: unknown, fallback: string) => {
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+
+    return fallback;
+  };
+
 
   const handleLanguageChange = (nextLanguage: Language) => {
     setLanguage(nextLanguage);
@@ -84,6 +97,61 @@ const App: React.FC = () => {
     window.print();
   };
 
+  const refreshSavedCompanies = async () => {
+    try {
+      const companies = await listSavedCompanies();
+      setSavedCompanies(companies);
+
+      if (!companies.length) {
+        setSelectedCompanyKey('');
+      } else if (!companies.some((company) => company.key === selectedCompanyKey)) {
+        setSelectedCompanyKey(companies[0].key);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSaveToBlob = async () => {
+    setIsPersisting(true);
+    try {
+      await saveCompanyReport(data.companyName, data);
+      await refreshSavedCompanies();
+      alert('Empresa salva com sucesso.');
+    } catch (error) {
+      console.error(error);
+      alert(getErrorMessage(error, 'Não foi possível salvar a empresa.'));
+    } finally {
+      setIsPersisting(false);
+    }
+  };
+
+  const handleLoadFromBlob = async () => {
+    if (!selectedCompanyKey) {
+      alert('Selecione uma empresa para importar.');
+      return;
+    }
+
+    setIsPersisting(true);
+    try {
+      const saved = await loadCompanyReport(selectedCompanyKey);
+      const merged = { ...INITIAL_DATA, ...saved.data };
+      setData(merged);
+      setInsights(null);
+      setPrintInsights(false);
+      alert('Empresa importada com sucesso.');
+    } catch (error) {
+      console.error(error);
+      alert(getErrorMessage(error, 'Não foi possível importar a empresa selecionada.'));
+    } finally {
+      setIsPersisting(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshSavedCompanies();
+  }, []);
+
     if (!logged) {
     return <Login onSuccess={() => setLogged(true)} />;
   }
@@ -96,7 +164,29 @@ const App: React.FC = () => {
           <div className="w-8 h-8 bg-white text-black font-bold flex items-center justify-center rounded">K</div>
           <h1 className="text-lg font-bold">Keep Gestão Contábil <span className="font-normal opacity-75">| Report Builder</span></h1>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedCompanyKey}
+              onChange={(e) => setSelectedCompanyKey(e.target.value)}
+              className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm text-white"
+            >
+              <option value="">Importar empresa...</option>
+              {savedCompanies.map((company) => (
+                <option key={company.key} value={company.key}>
+                  {company.companyName}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleLoadFromBlob}
+              disabled={isPersisting || !selectedCompanyKey}
+              className="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded text-sm font-medium disabled:opacity-60"
+            >
+              {isPersisting ? 'Importando...' : 'Importar'}
+            </button>
+          </div>
+
           <button 
             onClick={handlePrint}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2 font-medium transition"
@@ -121,6 +211,8 @@ const App: React.FC = () => {
             isGenerating={isGenerating}
             printInsights={printInsights}
             setPrintInsights={setPrintInsights}
+            onSaveToBlob={handleSaveToBlob}
+            isPersisting={isPersisting}
           />
         </div>
 

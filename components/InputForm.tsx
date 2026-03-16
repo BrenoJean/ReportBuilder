@@ -10,6 +10,8 @@ interface InputFormProps {
   isGenerating: boolean;
   printInsights: boolean;
   setPrintInsights: (val: boolean) => void;
+  onSaveToBlob: () => void;
+  isPersisting: boolean;
 }
 
 export const InputForm: React.FC<InputFormProps> = ({ 
@@ -20,7 +22,9 @@ export const InputForm: React.FC<InputFormProps> = ({
   onGenerateInsights, 
   isGenerating,
   printInsights,
-  setPrintInsights
+  setPrintInsights,
+  onSaveToBlob,
+  isPersisting
 }) => {
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -71,6 +75,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           </button>
         </div>
       </div>
+
       
       {/* Dados Gerais */}
       <div className="space-y-4 mb-6">
@@ -244,6 +249,21 @@ export const InputForm: React.FC<InputFormProps> = ({
           <input type="number" name="dreIncomeTaxCurrent" placeholder="Atual" value={data.dreIncomeTaxCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
           <input type="number" name="dreIncomeTaxPrev" placeholder="Anterior" value={data.dreIncomeTaxPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
         </div>
+      </div>
+
+      {/* Salvar empresa */}
+      <div className="mb-6 bg-blue-50 p-3 rounded border border-blue-200 space-y-2">
+        <h3 className="font-semibold text-sm text-blue-900">Salvar empresa</h3>
+        <p className="text-xs text-blue-800">Salva os dados preenchidos da empresa para reutilizar depois.</p>
+
+        <button
+          type="button"
+          onClick={onSaveToBlob}
+          disabled={isPersisting}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm disabled:opacity-60"
+        >
+          {isPersisting ? 'Salvando...' : 'Salvar empresa'}
+        </button>
       </div>
 
       {/* IA Section */}
