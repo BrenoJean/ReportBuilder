@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { FinancialData, INITIAL_DATA, Language } from './types';
 import { InputForm } from './components/InputForm';
 import { ReportPreview } from './components/ReportPreview';
 import { generateFinancialInsights } from './services/geminiService';
 import Login from "./components/Login"; // ✅ import correto
+import { listSavedCompanies, loadCompanyReport, saveCompanyReport, SavedCompanyEntry } from './services/blobReportService';
 
 const buildReportDate = (lang: Language, year: string) => {
   if (lang === 'en') {
@@ -21,6 +22,9 @@ const App: React.FC = () => {
   const [insights, setInsights] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [printInsights, setPrintInsights] = useState(false);
+  const [savedCompanies, setSavedCompanies] = useState<SavedCompanyEntry[]>([]);
+  const [selectedCompanyKey, setSelectedCompanyKey] = useState('');
+  const [isPersisting, setIsPersisting] = useState(false);
 
   const handleLanguageChange = (nextLanguage: Language) => {
     setLanguage(nextLanguage);
@@ -84,6 +88,59 @@ const App: React.FC = () => {
     window.print();
   };
 
+  const refreshSavedCompanies = async () => {
+    try {
+      const companies = await listSavedCompanies();
+      setSavedCompanies(companies);
+
+      if (companies.length && !selectedCompanyKey) {
+        setSelectedCompanyKey(companies[0].key);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSaveToBlob = async () => {
+    setIsPersisting(true);
+    try {
+      await saveCompanyReport(data.companyName, data);
+      await refreshSavedCompanies();
+      alert('JSON salvo com sucesso no Vercel Blob.');
+    } catch (error) {
+      console.error(error);
+      alert('Não foi possível salvar o JSON no Vercel Blob.');
+    } finally {
+      setIsPersisting(false);
+    }
+  };
+
+  const handleLoadFromBlob = async () => {
+    if (!selectedCompanyKey) {
+      alert('Selecione uma empresa para importar.');
+      return;
+    }
+
+    setIsPersisting(true);
+    try {
+      const saved = await loadCompanyReport(selectedCompanyKey);
+      const merged = { ...INITIAL_DATA, ...saved.data };
+      setData(merged);
+      setInsights(null);
+      setPrintInsights(false);
+      alert('JSON importado com sucesso.');
+    } catch (error) {
+      console.error(error);
+      alert('Não foi possível importar o JSON selecionado.');
+    } finally {
+      setIsPersisting(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshSavedCompanies();
+  }, []);
+
     if (!logged) {
     return <Login onSuccess={() => setLogged(true)} />;
   }
@@ -121,6 +178,12 @@ const App: React.FC = () => {
             isGenerating={isGenerating}
             printInsights={printInsights}
             setPrintInsights={setPrintInsights}
+            savedCompanies={savedCompanies}
+            selectedCompanyKey={selectedCompanyKey}
+            setSelectedCompanyKey={setSelectedCompanyKey}
+            onSaveToBlob={handleSaveToBlob}
+            onLoadFromBlob={handleLoadFromBlob}
+            isPersisting={isPersisting}
           />
         </div>
 
