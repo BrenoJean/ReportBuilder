@@ -35,14 +35,16 @@ export const InputForm: React.FC<InputFormProps> = ({
     data.equityCapitalSocialCurrent +
       data.equityRetainedEarningsUntil2023Current +
       data.equityRetainedEarnings2024Current +
-      data.equityRetainedEarnings2025Current !==
+      data.equityRetainedEarnings2025Current +
+      data.equityProfitReserveCurrent !==
     0;
 
   const hasPrevAnalyticalValues =
     data.equityCapitalSocialPrev +
       data.equityRetainedEarningsUntil2023Prev +
       data.equityRetainedEarnings2024Prev +
-      data.equityRetainedEarnings2025Prev !==
+      data.equityRetainedEarnings2025Prev +
+      data.equityProfitReservePrev !==
     0;
 
   return (
@@ -190,6 +192,11 @@ export const InputForm: React.FC<InputFormProps> = ({
           <label className="block text-sm col-span-2 pl-2">Lucros e Prejuízos 2025</label>
           <input type="number" name="equityRetainedEarnings2025Current" placeholder="Atual" value={data.equityRetainedEarnings2025Current} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
           <input type="number" name="equityRetainedEarnings2025Prev" placeholder="Anterior" value={data.equityRetainedEarnings2025Prev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
+
+          <label className="block text-sm col-span-2 pl-2">Reserva de Lucros</label>
+          <input type="number" name="equityProfitReserveCurrent" placeholder="Atual" value={data.equityProfitReserveCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="equityProfitReservePrev" placeholder="Anterior" value={data.equityProfitReservePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
 
           <label className="block text-sm font-bold col-span-2 pl-2">Total do Patrimônio Líquido</label>
           <input

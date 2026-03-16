@@ -44,6 +44,8 @@ export interface FinancialData {
   equityRetainedEarnings2024Prev: number;
   equityRetainedEarnings2025Current: number;
   equityRetainedEarnings2025Prev: number;
+  equityProfitReserveCurrent: number;
+  equityProfitReservePrev: number;
   equityTotalCurrent: number;
   equityTotalPrev: number;
   
@@ -105,6 +107,8 @@ export const INITIAL_DATA: FinancialData = {
   equityRetainedEarnings2024Prev: 0,
   equityRetainedEarnings2025Current: 0,
   equityRetainedEarnings2025Prev: 0,
+  equityProfitReserveCurrent: 0,
+  equityProfitReservePrev: 0,
   equityTotalCurrent: 0,
   equityTotalPrev: 0,
   

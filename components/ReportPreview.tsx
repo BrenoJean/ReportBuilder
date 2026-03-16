@@ -45,6 +45,7 @@ const translations = {
     retainedEarningsUntil2023: "Profits and losses until 2023",
     retainedEarnings2024: "Profits and losses 2024",
     retainedEarnings2025: "Profits and losses 2025",
+    profitReserve: "Profit Reserve",
 
     // Income Statement Labels
     revenue: "REVENUE",
@@ -104,6 +105,7 @@ const translations = {
     retainedEarningsUntil2023: "Lucros e prejuízos até 2023",
     retainedEarnings2024: "Lucros e prejuízos 2024",
     retainedEarnings2025: "Lucros e prejuízos 2025",
+    profitReserve: "Reserva de Lucros",
 
     // Income Statement Labels
     revenue: "RECEITA",
@@ -180,6 +182,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
   const shouldShowRetainedEarningsUntil2023 = data.equityRetainedEarningsUntil2023Current !== 0 || data.equityRetainedEarningsUntil2023Prev !== 0;
   const shouldShowRetainedEarnings2024 = data.equityRetainedEarnings2024Current !== 0 || data.equityRetainedEarnings2024Prev !== 0;
   const shouldShowRetainedEarnings2025 = data.equityRetainedEarnings2025Current !== 0 || data.equityRetainedEarnings2025Prev !== 0;
+  const shouldShowProfitReserve = data.equityProfitReserveCurrent !== 0 || data.equityProfitReservePrev !== 0;
 
   // Footer Component
   const Footer = () => (
@@ -406,6 +409,13 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
                 <td className="py-1 pl-4">{t.retainedEarnings2025}</td>
                 <td className="text-right">{formatCurrency(data.equityRetainedEarnings2025Current)}</td>
                 {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityRetainedEarnings2025Prev)}</td>}
+              </tr>
+            )}
+            {shouldShowProfitReserve && (
+              <tr>
+                <td className="py-1 pl-4">{t.profitReserve}</td>
+                <td className="text-right">{formatCurrency(data.equityProfitReserveCurrent)}</td>
+                {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityProfitReservePrev)}</td>}
               </tr>
             )}
             <tr className="border-t-2 border-black border-b-2 font-bold bg-gray-100">
