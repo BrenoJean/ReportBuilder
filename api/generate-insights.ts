@@ -161,7 +161,7 @@ REGRAS OBRIGATÓRIAS (não descumprir):
 1) Use SOMENTE os números do dataset abaixo. Não invente valores, percentuais, causas, tendências ou contexto externo.
 2) Sempre que citar variação, calcule com base exclusiva nos dados informados.
 3) Priorize comentar linhas com valores NÃO zero e materialidade mais alta; não foque em linhas zeradas.
-4) Se algum ponto não puder ser concluído pelos dados, diga explicitamente: "não é possível concluir com os dados disponíveis".
+4) Se algum ponto não puder ser concluído pelos dados,não diga explicitamente: "não é possível concluir com os dados disponíveis", tente usar algo genérico para finalizar o pensamento.
 5) Não afirmar ausência total de passivos, crescimento patrimonial, reinvestimento, liquidez confortável ou qualquer conclusão qualitativa sem suporte numérico explícito.
 6) Cite números com 2 casas decimais.
 7) Não use markdown, listas ou títulos. Apenas texto corrido em 3 parágrafos.
