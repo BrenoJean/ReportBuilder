@@ -6,6 +6,11 @@ const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const fmt = (value: number) =>
   new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0));
 
+const normalizeMarketValue = (value: number) => ({
+  revenue: Math.max(Number(value || 0), 0),
+  expense: Math.abs(Math.min(Number(value || 0), 0)),
+});
+
 const hasComparablePreviousYear = (data: any) => {
   if (!data?.showPrevYear) return false;
 
@@ -104,25 +109,30 @@ export default async function handler(req: any, res: any) {
       data.dreRevenueCurrent - data.dreCostOfSalesCurrent;
     const grossProfitPrev = data.dreRevenuePrev - data.dreCostOfSalesPrev;
 
+    const marketValueCurrent = normalizeMarketValue(data.dreOtherRevenuesMarketValueCurrent);
+    const marketValuePrev = normalizeMarketValue(data.dreOtherRevenuesMarketValuePrev);
+
     const totalOtherRevenuesCurrent =
       data.dreOtherRevenuesDividendsCurrent +
       data.dreOtherRevenuesEquityPickupCurrent +
       data.dreOtherRevenuesFinancialIncomeCurrent +
-      data.dreOtherRevenuesMarketValueCurrent;
+      marketValueCurrent.revenue;
     const totalOtherRevenuesPrev =
       data.dreOtherRevenuesDividendsPrev +
       data.dreOtherRevenuesEquityPickupPrev +
       data.dreOtherRevenuesFinancialIncomePrev +
-      data.dreOtherRevenuesMarketValuePrev;
+      marketValuePrev.revenue;
 
     const totalExpensesCurrent =
       data.dreOperatingExpensesCurrent +
       data.dreOtherExpensesCurrent +
-      data.dreIncomeTaxCurrent;
+      data.dreIncomeTaxCurrent +
+      marketValueCurrent.expense;
     const totalExpensesPrev =
       data.dreOperatingExpensesPrev +
       data.dreOtherExpensesPrev +
-      data.dreIncomeTaxPrev;
+      data.dreIncomeTaxPrev +
+      marketValuePrev.expense;
 
     const netIncomeCurrent = grossProfitCurrent + totalOtherRevenuesCurrent - totalExpensesCurrent;
     const netIncomePrev = grossProfitPrev + totalOtherRevenuesPrev - totalExpensesPrev;
@@ -164,9 +174,11 @@ export default async function handler(req: any, res: any) {
           dividends: { current: data.dreOtherRevenuesDividendsCurrent, previous: data.dreOtherRevenuesDividendsPrev },
           equityPickup: { current: data.dreOtherRevenuesEquityPickupCurrent, previous: data.dreOtherRevenuesEquityPickupPrev },
           financialIncome: { current: data.dreOtherRevenuesFinancialIncomeCurrent, previous: data.dreOtherRevenuesFinancialIncomePrev },
-          marketValue: { current: data.dreOtherRevenuesMarketValueCurrent, previous: data.dreOtherRevenuesMarketValuePrev },
+          marketValueGain: { current: marketValueCurrent.revenue, previous: marketValuePrev.revenue },
+          marketValueRaw: { current: data.dreOtherRevenuesMarketValueCurrent, previous: data.dreOtherRevenuesMarketValuePrev },
         },
         operatingExpenses: { current: data.dreOperatingExpensesCurrent, previous: data.dreOperatingExpensesPrev },
+        marketValueLoss: { current: marketValueCurrent.expense, previous: marketValuePrev.expense },
         otherExpenses: { current: data.dreOtherExpensesCurrent, previous: data.dreOtherExpensesPrev },
         incomeTax: { current: data.dreIncomeTaxCurrent, previous: data.dreIncomeTaxPrev },
         totalExpenses: { current: totalExpensesCurrent, previous: totalExpensesPrev },

@@ -8,6 +8,11 @@ interface ReportPreviewProps {
   language: Language;
 }
 
+const normalizeMarketValue = (value: number) => ({
+  revenue: Math.max(value, 0),
+  expense: Math.abs(Math.min(value, 0)),
+});
+
 // Dictionary for translations
 const translations = {
   en: {
@@ -58,6 +63,7 @@ const translations = {
     equityPickup: "Equity pickup",
     financialIncome: "Financial income",
     marketValue: "Market value",
+    marketValueLoss: "Market value loss",
     totalOtherRevenues: "TOTAL OTHER REVENUES",
     otherExpenses: "Other expenses",
     incomeTaxExpense: "Income tax expense",
@@ -125,6 +131,7 @@ const translations = {
     equityPickup: "Equivalência Patrimonial",
     financialIncome: "Rendimento Apl. Financeira",
     marketValue: "Valor de Mercado",
+    marketValueLoss: "Perda de valor de mercado",
     totalOtherRevenues: "TOTAL OUTRAS RECEITAS",
     otherExpenses: "Outras despesas",
     incomeTaxExpense: "Despesa com impostos",
@@ -182,6 +189,9 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
     data.liabilityLongTermPrev + 
     data.liabilityOtherPrev;
 
+  const marketValueCurrent = normalizeMarketValue(data.dreOtherRevenuesMarketValueCurrent);
+  const marketValuePrev = normalizeMarketValue(data.dreOtherRevenuesMarketValuePrev);
+
   // Income Statement Calculations
   const grossProfitCurrent = data.dreRevenueCurrent - data.dreCostOfSalesCurrent;
   const grossProfitPrev = data.dreRevenuePrev - data.dreCostOfSalesPrev;
@@ -190,15 +200,15 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
     data.dreOtherRevenuesDividendsCurrent +
     data.dreOtherRevenuesEquityPickupCurrent +
     data.dreOtherRevenuesFinancialIncomeCurrent +
-    data.dreOtherRevenuesMarketValueCurrent;
+    marketValueCurrent.revenue;
   const totalOtherRevenuesPrev =
     data.dreOtherRevenuesDividendsPrev +
     data.dreOtherRevenuesEquityPickupPrev +
     data.dreOtherRevenuesFinancialIncomePrev +
-    data.dreOtherRevenuesMarketValuePrev;
+    marketValuePrev.revenue;
 
-  const totalExpensesCurrent = data.dreOperatingExpensesCurrent + data.dreOtherExpensesCurrent + data.dreIncomeTaxCurrent;
-  const totalExpensesPrev = data.dreOperatingExpensesPrev + data.dreOtherExpensesPrev + data.dreIncomeTaxPrev;
+  const totalExpensesCurrent = data.dreOperatingExpensesCurrent + data.dreOtherExpensesCurrent + data.dreIncomeTaxCurrent + marketValueCurrent.expense;
+  const totalExpensesPrev = data.dreOperatingExpensesPrev + data.dreOtherExpensesPrev + data.dreIncomeTaxPrev + marketValuePrev.expense;
 
   const netIncomeCurrent = grossProfitCurrent + totalOtherRevenuesCurrent - totalExpensesCurrent;
   const netIncomePrev = grossProfitPrev + totalOtherRevenuesPrev - totalExpensesPrev;
@@ -211,8 +221,9 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
   const shouldShowDividends = data.dreOtherRevenuesDividendsCurrent !== 0 || data.dreOtherRevenuesDividendsPrev !== 0;
   const shouldShowEquityPickup = data.dreOtherRevenuesEquityPickupCurrent !== 0 || data.dreOtherRevenuesEquityPickupPrev !== 0;
   const shouldShowFinancialIncome = data.dreOtherRevenuesFinancialIncomeCurrent !== 0 || data.dreOtherRevenuesFinancialIncomePrev !== 0;
-  const shouldShowMarketValue = data.dreOtherRevenuesMarketValueCurrent !== 0 || data.dreOtherRevenuesMarketValuePrev !== 0;
-  const shouldShowOtherRevenues = shouldShowDividends || shouldShowEquityPickup || shouldShowFinancialIncome || shouldShowMarketValue;
+  const shouldShowMarketValueRevenue = marketValueCurrent.revenue !== 0 || marketValuePrev.revenue !== 0;
+  const shouldShowMarketValueLoss = marketValueCurrent.expense !== 0 || marketValuePrev.expense !== 0;
+  const shouldShowOtherRevenues = shouldShowDividends || shouldShowEquityPickup || shouldShowFinancialIncome || shouldShowMarketValueRevenue;
   const netIncomeLabel = netIncomeCurrent < 0 ? t.netLoss : t.netIncome;
 
   // Footer Component
@@ -518,11 +529,11 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
                     {data.showPrevYear && <td className="text-right">{formatCurrency(data.dreOtherRevenuesFinancialIncomePrev)}</td>}
                   </tr>
                 )}
-                {shouldShowMarketValue && (
+                {shouldShowMarketValueRevenue && (
                   <tr>
                     <td className="py-1 pl-4">{t.marketValue}</td>
-                    <td className="text-right">{formatCurrency(data.dreOtherRevenuesMarketValueCurrent)}</td>
-                    {data.showPrevYear && <td className="text-right">{formatCurrency(data.dreOtherRevenuesMarketValuePrev)}</td>}
+                    <td className="text-right">{formatCurrency(marketValueCurrent.revenue)}</td>
+                    {data.showPrevYear && <td className="text-right">{formatCurrency(marketValuePrev.revenue)}</td>}
                   </tr>
                 )}
                 <tr className="border-t border-black font-bold">
@@ -540,6 +551,13 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
               <td className="text-right">({formatCurrency(data.dreOperatingExpensesCurrent)})</td>
               {data.showPrevYear && <td className="text-right">({formatCurrency(data.dreOperatingExpensesPrev)})</td>}
             </tr>
+            {shouldShowMarketValueLoss && (
+              <tr>
+                <td className="py-1 pl-4">{t.marketValueLoss}</td>
+                <td className="text-right">({formatCurrency(marketValueCurrent.expense)})</td>
+                {data.showPrevYear && <td className="text-right">({formatCurrency(marketValuePrev.expense)})</td>}
+              </tr>
+            )}
             <tr>
               <td className="py-1 pl-4">{t.otherExpenses}</td>
               <td className="text-right">({formatCurrency(data.dreOtherExpensesCurrent)})</td>
