@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FinancialData, Language } from '../types';
 
 interface InputFormProps {
@@ -26,16 +26,183 @@ export const InputForm: React.FC<InputFormProps> = ({
   onSaveToBlob,
   isPersisting
 }) => {
-  
+  const numericFieldNames = useMemo(
+    () =>
+      new Set<keyof FinancialData>([
+        'assetCashCurrent',
+        'assetCashPrev',
+        'assetLoansCurrent',
+        'assetLoansPrev',
+        'assetInvestmentsCurrent',
+        'assetInvestmentsPrev',
+        'assetTangibleCurrent',
+        'assetTangiblePrev',
+        'assetIntangibleCurrent',
+        'assetIntangiblePrev',
+        'assetOtherCurrent',
+        'assetOtherPrev',
+        'liabilityPayablesCurrent',
+        'liabilityPayablesPrev',
+        'liabilityLongTermCurrent',
+        'liabilityLongTermPrev',
+        'liabilityOtherCurrent',
+        'liabilityOtherPrev',
+        'equityCapitalSocialCurrent',
+        'equityCapitalSocialPrev',
+        'equityRetainedEarningsUntil2023Current',
+        'equityRetainedEarningsUntil2023Prev',
+        'equityRetainedEarnings2024Current',
+        'equityRetainedEarnings2024Prev',
+        'equityRetainedEarnings2025Current',
+        'equityRetainedEarnings2025Prev',
+        'equityProfitReserveCurrent',
+        'equityProfitReservePrev',
+        'equityTotalCurrent',
+        'equityTotalPrev',
+        'dreRevenueCurrent',
+        'dreRevenuePrev',
+        'dreCostOfSalesCurrent',
+        'dreCostOfSalesPrev',
+        'dreOperatingExpensesCurrent',
+        'dreOperatingExpensesPrev',
+        'dreOtherRevenuesDividendsCurrent',
+        'dreOtherRevenuesDividendsPrev',
+        'dreOtherRevenuesEquityPickupCurrent',
+        'dreOtherRevenuesEquityPickupPrev',
+        'dreOtherRevenuesFinancialIncomeCurrent',
+        'dreOtherRevenuesFinancialIncomePrev',
+        'dreOtherRevenuesMarketValueCurrent',
+        'dreOtherRevenuesMarketValuePrev',
+        'dreOtherExpensesCurrent',
+        'dreOtherExpensesPrev',
+        'dreIncomeTaxCurrent',
+        'dreIncomeTaxPrev',
+      ]),
+    []
+  );
+  const [draftValues, setDraftValues] = useState<Partial<Record<keyof FinancialData, string>>>({});
+
+  useEffect(() => {
+    setDraftValues((prev) => {
+      const next = { ...prev };
+      let changed = false;
+
+      for (const fieldName of numericFieldNames) {
+        if (!(fieldName in prev)) {
+          continue;
+        }
+
+        const dataValue = data[fieldName];
+
+        if (typeof dataValue !== 'number') {
+          continue;
+        }
+
+        if (document.activeElement instanceof HTMLInputElement && document.activeElement.name === fieldName) {
+          continue;
+        }
+
+        const normalizedDataValue = dataValue === 0 ? '0' : String(dataValue);
+        if (prev[fieldName] === normalizedDataValue) {
+          delete next[fieldName];
+          changed = true;
+        }
+      }
+
+      return changed ? next : prev;
+    });
+  }, [data, numericFieldNames]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = e.target instanceof HTMLInputElement ? e.target.checked : false;
+    const field = name as keyof FinancialData;
 
-    onChange(
-      name as keyof FinancialData,
-      type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) || 0 : value
-    );
+    if (type === 'checkbox') {
+      onChange(field, checked);
+      return;
+    }
+
+    if (numericFieldNames.has(field)) {
+      const normalizedValue = value.replace(',', '.');
+
+      if (!/^[-]?\d*[.]?\d*$/.test(normalizedValue)) {
+        return;
+      }
+
+      setDraftValues((prev) => ({ ...prev, [field]: normalizedValue }));
+
+      if (normalizedValue === '' || normalizedValue === '-' || normalizedValue === '.' || normalizedValue === '-.') {
+        onChange(field, 0);
+        return;
+      }
+
+      const parsedValue = Number(normalizedValue);
+      if (!Number.isNaN(parsedValue)) {
+        onChange(field, parsedValue);
+      }
+      return;
+    }
+
+    onChange(field, value);
   };
+
+  const handleNumericBlur = (field: keyof FinancialData) => {
+    setDraftValues((prev) => {
+      const rawValue = prev[field];
+      if (rawValue === undefined) {
+        return prev;
+      }
+
+      const next = { ...prev };
+
+      if (rawValue === '' || rawValue === '-' || rawValue === '.' || rawValue === '-.') {
+        delete next[field];
+        onChange(field, 0);
+        return next;
+      }
+
+      const parsedValue = Number(rawValue);
+      if (Number.isNaN(parsedValue)) {
+        delete next[field];
+        return next;
+      }
+
+      next[field] = parsedValue === 0 ? '0' : String(parsedValue);
+      return next;
+    });
+  };
+
+  const handleNumericFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value === '0') {
+      e.target.select();
+    }
+  };
+
+  const getNumericValue = (field: keyof FinancialData) => {
+    const draftValue = draftValues[field];
+    if (draftValue !== undefined) {
+      return draftValue;
+    }
+
+    const dataValue = data[field];
+    return typeof dataValue === 'number' ? String(dataValue) : '';
+  };
+
+  const renderNumericInput = (field: keyof FinancialData, placeholder: string, disabled = false, className = '') => (
+    <input
+      type="text"
+      inputMode="decimal"
+      name={field}
+      placeholder={placeholder}
+      value={getNumericValue(field)}
+      onChange={handleChange}
+      onBlur={() => handleNumericBlur(field)}
+      onFocus={handleNumericFocus}
+      disabled={disabled}
+      className={`block w-full border border-gray-300 rounded px-2 py-1 text-sm ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''} ${className}`.trim()}
+    />
+  );
 
   const hasCurrentAnalyticalValues =
     data.equityCapitalSocialCurrent +
@@ -141,28 +308,28 @@ export const InputForm: React.FC<InputFormProps> = ({
         <h3 className="font-semibold text-gray-800 uppercase text-sm border-b border-gray-200 pb-1">Balanço: Ativos (USD)</h3>
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1">Caixa e Equivalentes</label>
-          <input type="number" name="assetCashCurrent" placeholder="Atual" value={data.assetCashCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="assetCashPrev" placeholder="Anterior" value={data.assetCashPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('assetCashCurrent', 'Atual')}
+          {renderNumericInput('assetCashPrev', 'Anterior')}
           
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Empréstimos e Recebíveis</label>
-          <input type="number" name="assetLoansCurrent" placeholder="Atual" value={data.assetLoansCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="assetLoansPrev" placeholder="Anterior" value={data.assetLoansPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('assetLoansCurrent', 'Atual')}
+          {renderNumericInput('assetLoansPrev', 'Anterior')}
           
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Investimentos e Ativos Financeiros</label>
-          <input type="number" name="assetInvestmentsCurrent" placeholder="Atual" value={data.assetInvestmentsCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="assetInvestmentsPrev" placeholder="Anterior" value={data.assetInvestmentsPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('assetInvestmentsCurrent', 'Atual')}
+          {renderNumericInput('assetInvestmentsPrev', 'Anterior')}
           
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Ativos Tangíveis (Imobilizado)</label>
-          <input type="number" name="assetTangibleCurrent" placeholder="Atual" value={data.assetTangibleCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="assetTangiblePrev" placeholder="Anterior" value={data.assetTangiblePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('assetTangibleCurrent', 'Atual')}
+          {renderNumericInput('assetTangiblePrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Ativos Intangíveis</label>
-          <input type="number" name="assetIntangibleCurrent" placeholder="Atual" value={data.assetIntangibleCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="assetIntangiblePrev" placeholder="Anterior" value={data.assetIntangiblePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('assetIntangibleCurrent', 'Atual')}
+          {renderNumericInput('assetIntangiblePrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Outros Ativos</label>
-          <input type="number" name="assetOtherCurrent" placeholder="Atual" value={data.assetOtherCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="assetOtherPrev" placeholder="Anterior" value={data.assetOtherPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('assetOtherCurrent', 'Atual')}
+          {renderNumericInput('assetOtherPrev', 'Anterior')}
         </div>
       </div>
 
@@ -171,57 +338,41 @@ export const InputForm: React.FC<InputFormProps> = ({
         <h3 className="font-semibold text-gray-800 uppercase text-sm border-b border-gray-200 pb-1">Balanço: Passivos e PL (USD)</h3>
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1">Contas a Pagar</label>
-          <input type="number" name="liabilityPayablesCurrent" placeholder="Atual" value={data.liabilityPayablesCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="liabilityPayablesPrev" placeholder="Anterior" value={data.liabilityPayablesPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('liabilityPayablesCurrent', 'Atual')}
+          {renderNumericInput('liabilityPayablesPrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Dívidas de Longo Prazo</label>
-          <input type="number" name="liabilityLongTermCurrent" placeholder="Atual" value={data.liabilityLongTermCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="liabilityLongTermPrev" placeholder="Anterior" value={data.liabilityLongTermPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('liabilityLongTermCurrent', 'Atual')}
+          {renderNumericInput('liabilityLongTermPrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Outros Passivos</label>
-          <input type="number" name="liabilityOtherCurrent" placeholder="Atual" value={data.liabilityOtherCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="liabilityOtherPrev" placeholder="Anterior" value={data.liabilityOtherPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('liabilityOtherCurrent', 'Atual')}
+          {renderNumericInput('liabilityOtherPrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Patrimônio Líquido (Shareholder's Equity)</label>
 
           <label className="block text-sm col-span-2 pl-2">Capital Social</label>
-          <input type="number" name="equityCapitalSocialCurrent" placeholder="Atual" value={data.equityCapitalSocialCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="equityCapitalSocialPrev" placeholder="Anterior" value={data.equityCapitalSocialPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('equityCapitalSocialCurrent', 'Atual')}
+          {renderNumericInput('equityCapitalSocialPrev', 'Anterior')}
 
           <label className="block text-sm col-span-2 pl-2">Reserva de Lucros</label>
-          <input type="number" name="equityProfitReserveCurrent" placeholder="Atual" value={data.equityProfitReserveCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="equityProfitReservePrev" placeholder="Anterior" value={data.equityProfitReservePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('equityProfitReserveCurrent', 'Atual')}
+          {renderNumericInput('equityProfitReservePrev', 'Anterior')}
 
           <label className="block text-sm col-span-2 pl-2">Lucros e Prejuízos até 2023</label>
-          <input type="number" name="equityRetainedEarningsUntil2023Current" placeholder="Atual" value={data.equityRetainedEarningsUntil2023Current} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="equityRetainedEarningsUntil2023Prev" placeholder="Anterior" value={data.equityRetainedEarningsUntil2023Prev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('equityRetainedEarningsUntil2023Current', 'Atual')}
+          {renderNumericInput('equityRetainedEarningsUntil2023Prev', 'Anterior')}
 
           <label className="block text-sm col-span-2 pl-2">Lucros e Prejuízos 2024</label>
-          <input type="number" name="equityRetainedEarnings2024Current" placeholder="Atual" value={data.equityRetainedEarnings2024Current} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="equityRetainedEarnings2024Prev" placeholder="Anterior" value={data.equityRetainedEarnings2024Prev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('equityRetainedEarnings2024Current', 'Atual')}
+          {renderNumericInput('equityRetainedEarnings2024Prev', 'Anterior')}
 
           <label className="block text-sm col-span-2 pl-2">Lucros e Prejuízos 2025</label>
-          <input type="number" name="equityRetainedEarnings2025Current" placeholder="Atual" value={data.equityRetainedEarnings2025Current} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="equityRetainedEarnings2025Prev" placeholder="Anterior" value={data.equityRetainedEarnings2025Prev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('equityRetainedEarnings2025Current', 'Atual')}
+          {renderNumericInput('equityRetainedEarnings2025Prev', 'Anterior')}
           <label className="block text-sm font-bold col-span-2 pl-2">Total do Patrimônio Líquido</label>
-          <input
-            type="number"
-            name="equityTotalCurrent"
-            placeholder="Atual"
-            value={data.equityTotalCurrent}
-            onChange={handleChange}
-            disabled={hasCurrentAnalyticalValues}
-            className={`block w-full border border-gray-300 rounded px-2 py-1 text-sm ${hasCurrentAnalyticalValues ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
-          />
-          <input
-            type="number"
-            name="equityTotalPrev"
-            placeholder="Anterior"
-            value={data.equityTotalPrev}
-            onChange={handleChange}
-            disabled={hasPrevAnalyticalValues}
-            className={`block w-full border border-gray-300 rounded px-2 py-1 text-sm ${hasPrevAnalyticalValues ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
-          />
+          {renderNumericInput('equityTotalCurrent', 'Atual', hasCurrentAnalyticalValues)}
+          {renderNumericInput('equityTotalPrev', 'Anterior', hasPrevAnalyticalValues)}
         </div>
       </div>
 
@@ -230,42 +381,42 @@ export const InputForm: React.FC<InputFormProps> = ({
         <h3 className="font-semibold text-gray-800 uppercase text-sm border-b border-gray-200 pb-1">DRE (Income Statement)</h3>
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1">Receita (Revenue)</label>
-          <input type="number" name="dreRevenueCurrent" placeholder="Atual" value={data.dreRevenueCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="dreRevenuePrev" placeholder="Anterior" value={data.dreRevenuePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('dreRevenueCurrent', 'Atual')}
+          {renderNumericInput('dreRevenuePrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Custo das Vendas (Cost of Sales)</label>
-          <input type="number" name="dreCostOfSalesCurrent" placeholder="Atual" value={data.dreCostOfSalesCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="dreCostOfSalesPrev" placeholder="Anterior" value={data.dreCostOfSalesPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('dreCostOfSalesCurrent', 'Atual')}
+          {renderNumericInput('dreCostOfSalesPrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Outras Receitas</label>
 
           <label className="block text-sm col-span-2 pl-2">Dividendos</label>
-          <input type="number" name="dreOtherRevenuesDividendsCurrent" placeholder="Atual" value={data.dreOtherRevenuesDividendsCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="dreOtherRevenuesDividendsPrev" placeholder="Anterior" value={data.dreOtherRevenuesDividendsPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('dreOtherRevenuesDividendsCurrent', 'Atual')}
+          {renderNumericInput('dreOtherRevenuesDividendsPrev', 'Anterior')}
 
           <label className="block text-sm col-span-2 pl-2">Equivalência Patrimonial</label>
-          <input type="number" name="dreOtherRevenuesEquityPickupCurrent" placeholder="Atual" value={data.dreOtherRevenuesEquityPickupCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="dreOtherRevenuesEquityPickupPrev" placeholder="Anterior" value={data.dreOtherRevenuesEquityPickupPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('dreOtherRevenuesEquityPickupCurrent', 'Atual')}
+          {renderNumericInput('dreOtherRevenuesEquityPickupPrev', 'Anterior')}
 
           <label className="block text-sm col-span-2 pl-2">Rendimento Apl. Financeira</label>
-          <input type="number" name="dreOtherRevenuesFinancialIncomeCurrent" placeholder="Atual" value={data.dreOtherRevenuesFinancialIncomeCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="dreOtherRevenuesFinancialIncomePrev" placeholder="Anterior" value={data.dreOtherRevenuesFinancialIncomePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('dreOtherRevenuesFinancialIncomeCurrent', 'Atual')}
+          {renderNumericInput('dreOtherRevenuesFinancialIncomePrev', 'Anterior')}
 
           <label className="block text-sm col-span-2 pl-2">Valor de Mercado <span className="text-xs text-gray-500">(aceita negativo)</span></label>
-          <input type="number" name="dreOtherRevenuesMarketValueCurrent" placeholder="Atual" value={data.dreOtherRevenuesMarketValueCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="dreOtherRevenuesMarketValuePrev" placeholder="Anterior" value={data.dreOtherRevenuesMarketValuePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('dreOtherRevenuesMarketValueCurrent', 'Atual')}
+          {renderNumericInput('dreOtherRevenuesMarketValuePrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Despesas Operacionais</label>
-          <input type="number" name="dreOperatingExpensesCurrent" placeholder="Atual" value={data.dreOperatingExpensesCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="dreOperatingExpensesPrev" placeholder="Anterior" value={data.dreOperatingExpensesPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('dreOperatingExpensesCurrent', 'Atual')}
+          {renderNumericInput('dreOperatingExpensesPrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Outras Despesas</label>
-          <input type="number" name="dreOtherExpensesCurrent" placeholder="Atual" value={data.dreOtherExpensesCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="dreOtherExpensesPrev" placeholder="Anterior" value={data.dreOtherExpensesPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('dreOtherExpensesCurrent', 'Atual')}
+          {renderNumericInput('dreOtherExpensesPrev', 'Anterior')}
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Despesa com impostos</label>
-          <input type="number" name="dreIncomeTaxCurrent" placeholder="Atual" value={data.dreIncomeTaxCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="dreIncomeTaxPrev" placeholder="Anterior" value={data.dreIncomeTaxPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          {renderNumericInput('dreIncomeTaxCurrent', 'Atual')}
+          {renderNumericInput('dreIncomeTaxPrev', 'Anterior')}
         </div>
       </div>
 
