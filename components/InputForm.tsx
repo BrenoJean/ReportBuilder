@@ -251,7 +251,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           <input type="number" name="dreOtherRevenuesFinancialIncomeCurrent" placeholder="Atual" value={data.dreOtherRevenuesFinancialIncomeCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
           <input type="number" name="dreOtherRevenuesFinancialIncomePrev" placeholder="Anterior" value={data.dreOtherRevenuesFinancialIncomePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
 
-          <label className="block text-sm col-span-2 pl-2">Valor de Mercado</label>
+          <label className="block text-sm col-span-2 pl-2">Valor de Mercado <span className="text-xs text-gray-500">(aceita negativo)</span></label>
           <input type="number" name="dreOtherRevenuesMarketValueCurrent" placeholder="Atual" value={data.dreOtherRevenuesMarketValueCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
           <input type="number" name="dreOtherRevenuesMarketValuePrev" placeholder="Anterior" value={data.dreOtherRevenuesMarketValuePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
 
