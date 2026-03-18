@@ -57,6 +57,7 @@ const translations = {
     dividends: "Dividends",
     equityPickup: "Equity pickup",
     financialIncome: "Financial income",
+    marketValue: "Market value",
     totalOtherRevenues: "TOTAL OTHER REVENUES",
     otherExpenses: "Other expenses",
     incomeTaxExpense: "Income tax expense",
@@ -123,6 +124,7 @@ const translations = {
     dividends: "Dividendos",
     equityPickup: "Equivalência Patrimonial",
     financialIncome: "Rendimento Apl. Financeira",
+    marketValue: "Valor de Mercado",
     totalOtherRevenues: "TOTAL OUTRAS RECEITAS",
     otherExpenses: "Outras despesas",
     incomeTaxExpense: "Despesa com impostos",
@@ -187,11 +189,13 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
   const totalOtherRevenuesCurrent =
     data.dreOtherRevenuesDividendsCurrent +
     data.dreOtherRevenuesEquityPickupCurrent +
-    data.dreOtherRevenuesFinancialIncomeCurrent;
+    data.dreOtherRevenuesFinancialIncomeCurrent +
+    data.dreOtherRevenuesMarketValueCurrent;
   const totalOtherRevenuesPrev =
     data.dreOtherRevenuesDividendsPrev +
     data.dreOtherRevenuesEquityPickupPrev +
-    data.dreOtherRevenuesFinancialIncomePrev;
+    data.dreOtherRevenuesFinancialIncomePrev +
+    data.dreOtherRevenuesMarketValuePrev;
 
   const totalExpensesCurrent = data.dreOperatingExpensesCurrent + data.dreOtherExpensesCurrent + data.dreIncomeTaxCurrent;
   const totalExpensesPrev = data.dreOperatingExpensesPrev + data.dreOtherExpensesPrev + data.dreIncomeTaxPrev;
@@ -207,7 +211,8 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
   const shouldShowDividends = data.dreOtherRevenuesDividendsCurrent !== 0 || data.dreOtherRevenuesDividendsPrev !== 0;
   const shouldShowEquityPickup = data.dreOtherRevenuesEquityPickupCurrent !== 0 || data.dreOtherRevenuesEquityPickupPrev !== 0;
   const shouldShowFinancialIncome = data.dreOtherRevenuesFinancialIncomeCurrent !== 0 || data.dreOtherRevenuesFinancialIncomePrev !== 0;
-  const shouldShowOtherRevenues = shouldShowDividends || shouldShowEquityPickup || shouldShowFinancialIncome;
+  const shouldShowMarketValue = data.dreOtherRevenuesMarketValueCurrent !== 0 || data.dreOtherRevenuesMarketValuePrev !== 0;
+  const shouldShowOtherRevenues = shouldShowDividends || shouldShowEquityPickup || shouldShowFinancialIncome || shouldShowMarketValue;
   const netIncomeLabel = netIncomeCurrent < 0 ? t.netLoss : t.netIncome;
 
   // Footer Component
@@ -511,6 +516,13 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
                     <td className="py-1 pl-4">{t.financialIncome}</td>
                     <td className="text-right">{formatCurrency(data.dreOtherRevenuesFinancialIncomeCurrent)}</td>
                     {data.showPrevYear && <td className="text-right">{formatCurrency(data.dreOtherRevenuesFinancialIncomePrev)}</td>}
+                  </tr>
+                )}
+                {shouldShowMarketValue && (
+                  <tr>
+                    <td className="py-1 pl-4">{t.marketValue}</td>
+                    <td className="text-right">{formatCurrency(data.dreOtherRevenuesMarketValueCurrent)}</td>
+                    {data.showPrevYear && <td className="text-right">{formatCurrency(data.dreOtherRevenuesMarketValuePrev)}</td>}
                   </tr>
                 )}
                 <tr className="border-t border-black font-bold">
