@@ -57,6 +57,12 @@ export interface FinancialData {
   
   dreOperatingExpensesCurrent: number;
   dreOperatingExpensesPrev: number;
+  dreOtherRevenuesDividendsCurrent: number;
+  dreOtherRevenuesDividendsPrev: number;
+  dreOtherRevenuesEquityPickupCurrent: number;
+  dreOtherRevenuesEquityPickupPrev: number;
+  dreOtherRevenuesFinancialIncomeCurrent: number;
+  dreOtherRevenuesFinancialIncomePrev: number;
   dreOtherExpensesCurrent: number;
   dreOtherExpensesPrev: number;
   dreIncomeTaxCurrent: number;
@@ -119,6 +125,12 @@ export const INITIAL_DATA: FinancialData = {
   dreCostOfSalesPrev: 0,
   dreOperatingExpensesCurrent: 0,
   dreOperatingExpensesPrev: 0,
+  dreOtherRevenuesDividendsCurrent: 0,
+  dreOtherRevenuesDividendsPrev: 0,
+  dreOtherRevenuesEquityPickupCurrent: 0,
+  dreOtherRevenuesEquityPickupPrev: 0,
+  dreOtherRevenuesFinancialIncomeCurrent: 0,
+  dreOtherRevenuesFinancialIncomePrev: 0,
   dreOtherExpensesCurrent: 0,
   dreOtherExpensesPrev: 0,
   dreIncomeTaxCurrent: 0,
