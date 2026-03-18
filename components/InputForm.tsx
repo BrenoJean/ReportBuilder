@@ -28,9 +28,11 @@ export const InputForm: React.FC<InputFormProps> = ({
 }) => {
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
+    const checked = e.target instanceof HTMLInputElement ? e.target.checked : false;
+
     onChange(
-      name as keyof FinancialData, 
+      name as keyof FinancialData,
       type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) || 0 : value
     );
   };
@@ -220,8 +222,6 @@ export const InputForm: React.FC<InputFormProps> = ({
             disabled={hasPrevAnalyticalValues}
             className={`block w-full border border-gray-300 rounded px-2 py-1 text-sm ${hasPrevAnalyticalValues ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
           />
-          <input type="number" name="equityTotalCurrent" placeholder="Atual" value={data.equityTotalCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
-          <input type="number" name="equityTotalPrev" placeholder="Anterior" value={data.equityTotalPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
         </div>
       </div>
 
@@ -236,6 +236,20 @@ export const InputForm: React.FC<InputFormProps> = ({
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Custo das Vendas (Cost of Sales)</label>
           <input type="number" name="dreCostOfSalesCurrent" placeholder="Atual" value={data.dreCostOfSalesCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
           <input type="number" name="dreCostOfSalesPrev" placeholder="Anterior" value={data.dreCostOfSalesPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
+          <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Outras Receitas</label>
+
+          <label className="block text-sm col-span-2 pl-2">Dividendos</label>
+          <input type="number" name="dreOtherRevenuesDividendsCurrent" placeholder="Atual" value={data.dreOtherRevenuesDividendsCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="dreOtherRevenuesDividendsPrev" placeholder="Anterior" value={data.dreOtherRevenuesDividendsPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
+          <label className="block text-sm col-span-2 pl-2">Equivalência Patrimonial</label>
+          <input type="number" name="dreOtherRevenuesEquityPickupCurrent" placeholder="Atual" value={data.dreOtherRevenuesEquityPickupCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="dreOtherRevenuesEquityPickupPrev" placeholder="Anterior" value={data.dreOtherRevenuesEquityPickupPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
+          <label className="block text-sm col-span-2 pl-2">Rendimento Apl. Financeira</label>
+          <input type="number" name="dreOtherRevenuesFinancialIncomeCurrent" placeholder="Atual" value={data.dreOtherRevenuesFinancialIncomeCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="dreOtherRevenuesFinancialIncomePrev" placeholder="Anterior" value={data.dreOtherRevenuesFinancialIncomePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
 
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Despesas Operacionais</label>
           <input type="number" name="dreOperatingExpensesCurrent" placeholder="Atual" value={data.dreOperatingExpensesCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />

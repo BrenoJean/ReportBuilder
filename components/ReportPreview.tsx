@@ -53,10 +53,16 @@ const translations = {
     grossProfit: "GROSS PROFIT",
     expenses: "EXPENSES",
     operatingExpenses: "Operating expenses",
+    otherRevenues: "OTHER REVENUES",
+    dividends: "Dividends",
+    equityPickup: "Equity pickup",
+    financialIncome: "Financial income",
+    totalOtherRevenues: "TOTAL OTHER REVENUES",
     otherExpenses: "Other expenses",
     incomeTaxExpense: "Income tax expense",
     totalExpenses: "TOTAL EXPENSES",
     netIncome: "NET INCOME",
+    netLoss: "NET LOSS",
 
     disclaimer: "The accompanying notes are an integral part of these financial statements.",
     director: "Director",
@@ -113,10 +119,16 @@ const translations = {
     grossProfit: "LUCRO BRUTO",
     expenses: "DESPESAS",
     operatingExpenses: "Despesas operacionais",
+    otherRevenues: "OUTRAS RECEITAS",
+    dividends: "Dividendos",
+    equityPickup: "Equivalência Patrimonial",
+    financialIncome: "Rendimento Apl. Financeira",
+    totalOtherRevenues: "TOTAL OUTRAS RECEITAS",
     otherExpenses: "Outras despesas",
     incomeTaxExpense: "Despesa com impostos",
     totalExpenses: "TOTAL DE DESPESAS",
     netIncome: "LUCRO LÍQUIDO",
+    netLoss: "PREJUÍZO LÍQUIDO",
 
     disclaimer: "As notas explicativas são parte integrante destas demonstrações financeiras.",
     director: "Diretor",
@@ -172,17 +184,31 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
   const grossProfitCurrent = data.dreRevenueCurrent - data.dreCostOfSalesCurrent;
   const grossProfitPrev = data.dreRevenuePrev - data.dreCostOfSalesPrev;
 
+  const totalOtherRevenuesCurrent =
+    data.dreOtherRevenuesDividendsCurrent +
+    data.dreOtherRevenuesEquityPickupCurrent +
+    data.dreOtherRevenuesFinancialIncomeCurrent;
+  const totalOtherRevenuesPrev =
+    data.dreOtherRevenuesDividendsPrev +
+    data.dreOtherRevenuesEquityPickupPrev +
+    data.dreOtherRevenuesFinancialIncomePrev;
+
   const totalExpensesCurrent = data.dreOperatingExpensesCurrent + data.dreOtherExpensesCurrent + data.dreIncomeTaxCurrent;
   const totalExpensesPrev = data.dreOperatingExpensesPrev + data.dreOtherExpensesPrev + data.dreIncomeTaxPrev;
 
-  const netIncomeCurrent = grossProfitCurrent - totalExpensesCurrent;
-  const netIncomePrev = grossProfitPrev - totalExpensesPrev;
+  const netIncomeCurrent = grossProfitCurrent + totalOtherRevenuesCurrent - totalExpensesCurrent;
+  const netIncomePrev = grossProfitPrev + totalOtherRevenuesPrev - totalExpensesPrev;
 
   const shouldShowCapitalSocial = data.equityCapitalSocialCurrent !== 0 || data.equityCapitalSocialPrev !== 0;
   const shouldShowRetainedEarningsUntil2023 = data.equityRetainedEarningsUntil2023Current !== 0 || data.equityRetainedEarningsUntil2023Prev !== 0;
   const shouldShowRetainedEarnings2024 = data.equityRetainedEarnings2024Current !== 0 || data.equityRetainedEarnings2024Prev !== 0;
   const shouldShowRetainedEarnings2025 = data.equityRetainedEarnings2025Current !== 0 || data.equityRetainedEarnings2025Prev !== 0;
   const shouldShowProfitReserve = data.equityProfitReserveCurrent !== 0 || data.equityProfitReservePrev !== 0;
+  const shouldShowDividends = data.dreOtherRevenuesDividendsCurrent !== 0 || data.dreOtherRevenuesDividendsPrev !== 0;
+  const shouldShowEquityPickup = data.dreOtherRevenuesEquityPickupCurrent !== 0 || data.dreOtherRevenuesEquityPickupPrev !== 0;
+  const shouldShowFinancialIncome = data.dreOtherRevenuesFinancialIncomeCurrent !== 0 || data.dreOtherRevenuesFinancialIncomePrev !== 0;
+  const shouldShowOtherRevenues = shouldShowDividends || shouldShowEquityPickup || shouldShowFinancialIncome;
+  const netIncomeLabel = netIncomeCurrent < 0 ? t.netLoss : t.netIncome;
 
   // Footer Component
   const Footer = () => (
@@ -463,6 +489,38 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
               {data.showPrevYear && <td className="text-right">{formatCurrency(grossProfitPrev)}</td>}
             </tr>
 
+            {shouldShowOtherRevenues && (
+              <>
+                <tr><td className="pt-8 font-bold" colSpan={data.showPrevYear ? 3 : 2}>{t.otherRevenues}</td></tr>
+                {shouldShowDividends && (
+                  <tr>
+                    <td className="py-1 pl-4">{t.dividends}</td>
+                    <td className="text-right">{formatCurrency(data.dreOtherRevenuesDividendsCurrent)}</td>
+                    {data.showPrevYear && <td className="text-right">{formatCurrency(data.dreOtherRevenuesDividendsPrev)}</td>}
+                  </tr>
+                )}
+                {shouldShowEquityPickup && (
+                  <tr>
+                    <td className="py-1 pl-4">{t.equityPickup}</td>
+                    <td className="text-right">{formatCurrency(data.dreOtherRevenuesEquityPickupCurrent)}</td>
+                    {data.showPrevYear && <td className="text-right">{formatCurrency(data.dreOtherRevenuesEquityPickupPrev)}</td>}
+                  </tr>
+                )}
+                {shouldShowFinancialIncome && (
+                  <tr>
+                    <td className="py-1 pl-4">{t.financialIncome}</td>
+                    <td className="text-right">{formatCurrency(data.dreOtherRevenuesFinancialIncomeCurrent)}</td>
+                    {data.showPrevYear && <td className="text-right">{formatCurrency(data.dreOtherRevenuesFinancialIncomePrev)}</td>}
+                  </tr>
+                )}
+                <tr className="border-t border-black font-bold">
+                  <td className="py-1">{t.totalOtherRevenues}</td>
+                  <td className="text-right">{formatCurrency(totalOtherRevenuesCurrent)}</td>
+                  {data.showPrevYear && <td className="text-right">{formatCurrency(totalOtherRevenuesPrev)}</td>}
+                </tr>
+              </>
+            )}
+
             {/* Expenses */}
             <tr><td className="pt-8 font-bold" colSpan={data.showPrevYear ? 3 : 2}>{t.expenses}</td></tr>
             <tr>
@@ -488,7 +546,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
              
              {/* Net Income */}
              <tr className="border-t-2 border-black border-b-2 font-bold bg-gray-100">
-              <td className="py-2">{t.netIncome}</td>
+              <td className="py-2">{netIncomeLabel}</td>
               <td className="text-right py-2">{formatCurrency(netIncomeCurrent)}</td>
               {data.showPrevYear && <td className="text-right py-2">{formatCurrency(netIncomePrev)}</td>}
             </tr>

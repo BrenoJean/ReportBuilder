@@ -28,6 +28,9 @@ const hasComparablePreviousYear = (data: any) => {
     data.dreRevenuePrev,
     data.dreCostOfSalesPrev,
     data.dreOperatingExpensesPrev,
+    data.dreOtherRevenuesDividendsPrev,
+    data.dreOtherRevenuesEquityPickupPrev,
+    data.dreOtherRevenuesFinancialIncomePrev,
     data.dreOtherExpensesPrev,
     data.dreIncomeTaxPrev,
   ];
@@ -100,6 +103,15 @@ export default async function handler(req: any, res: any) {
       data.dreRevenueCurrent - data.dreCostOfSalesCurrent;
     const grossProfitPrev = data.dreRevenuePrev - data.dreCostOfSalesPrev;
 
+    const totalOtherRevenuesCurrent =
+      data.dreOtherRevenuesDividendsCurrent +
+      data.dreOtherRevenuesEquityPickupCurrent +
+      data.dreOtherRevenuesFinancialIncomeCurrent;
+    const totalOtherRevenuesPrev =
+      data.dreOtherRevenuesDividendsPrev +
+      data.dreOtherRevenuesEquityPickupPrev +
+      data.dreOtherRevenuesFinancialIncomePrev;
+
     const totalExpensesCurrent =
       data.dreOperatingExpensesCurrent +
       data.dreOtherExpensesCurrent +
@@ -109,8 +121,8 @@ export default async function handler(req: any, res: any) {
       data.dreOtherExpensesPrev +
       data.dreIncomeTaxPrev;
 
-    const netIncomeCurrent = grossProfitCurrent - totalExpensesCurrent;
-    const netIncomePrev = grossProfitPrev - totalExpensesPrev;
+    const netIncomeCurrent = grossProfitCurrent + totalOtherRevenuesCurrent - totalExpensesCurrent;
+    const netIncomePrev = grossProfitPrev + totalOtherRevenuesPrev - totalExpensesPrev;
 
     const totalLiabilitiesCurrent =
       data.liabilityPayablesCurrent +
@@ -144,6 +156,12 @@ export default async function handler(req: any, res: any) {
         revenue: { current: data.dreRevenueCurrent, previous: data.dreRevenuePrev },
         costOfSales: { current: data.dreCostOfSalesCurrent, previous: data.dreCostOfSalesPrev },
         grossProfit: { current: grossProfitCurrent, previous: grossProfitPrev },
+        otherRevenues: {
+          total: { current: totalOtherRevenuesCurrent, previous: totalOtherRevenuesPrev },
+          dividends: { current: data.dreOtherRevenuesDividendsCurrent, previous: data.dreOtherRevenuesDividendsPrev },
+          equityPickup: { current: data.dreOtherRevenuesEquityPickupCurrent, previous: data.dreOtherRevenuesEquityPickupPrev },
+          financialIncome: { current: data.dreOtherRevenuesFinancialIncomeCurrent, previous: data.dreOtherRevenuesFinancialIncomePrev },
+        },
         operatingExpenses: { current: data.dreOperatingExpensesCurrent, previous: data.dreOperatingExpensesPrev },
         otherExpenses: { current: data.dreOtherExpensesCurrent, previous: data.dreOtherExpensesPrev },
         incomeTax: { current: data.dreIncomeTaxCurrent, previous: data.dreIncomeTaxPrev },
@@ -172,7 +190,8 @@ Resumo numérico rápido (USD):
 - Passivos totais: ${fmt(totalLiabilitiesCurrent)} (anterior: ${fmt(totalLiabilitiesPrev)})
 - Patrimônio líquido: ${fmt(data.equityTotalCurrent)} (anterior: ${fmt(data.equityTotalPrev)})
 - Receita: ${fmt(data.dreRevenueCurrent)} (anterior: ${fmt(data.dreRevenuePrev)})
-- Lucro líquido: ${fmt(netIncomeCurrent)} (anterior: ${fmt(netIncomePrev)})
+- Outras receitas: ${fmt(totalOtherRevenuesCurrent)} (anterior: ${fmt(totalOtherRevenuesPrev)})
+- Resultado líquido: ${fmt(netIncomeCurrent)} (anterior: ${fmt(netIncomePrev)})
 
 Dataset completo (JSON):
 ${JSON.stringify(dataset)}

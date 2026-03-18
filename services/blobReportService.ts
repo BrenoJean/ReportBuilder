@@ -20,7 +20,7 @@ export interface SavedCompanyEntry {
 const API_BASE = '/api/reports';
 const IS_LOCAL_DEV = Boolean(import.meta.env.DEV);
 
-export const REPORT_SCHEMA_VERSION = 1;
+export const REPORT_SCHEMA_VERSION = 2;
 
 export const buildEvolvingReport = (data: FinancialData): SavedReportEnvelope => ({
   schemaVersion: REPORT_SCHEMA_VERSION,
