@@ -31,6 +31,7 @@ const hasComparablePreviousYear = (data: any) => {
     data.dreOtherRevenuesDividendsPrev,
     data.dreOtherRevenuesEquityPickupPrev,
     data.dreOtherRevenuesFinancialIncomePrev,
+    data.dreOtherRevenuesMarketValuePrev,
     data.dreOtherExpensesPrev,
     data.dreIncomeTaxPrev,
   ];
@@ -106,11 +107,13 @@ export default async function handler(req: any, res: any) {
     const totalOtherRevenuesCurrent =
       data.dreOtherRevenuesDividendsCurrent +
       data.dreOtherRevenuesEquityPickupCurrent +
-      data.dreOtherRevenuesFinancialIncomeCurrent;
+      data.dreOtherRevenuesFinancialIncomeCurrent +
+      data.dreOtherRevenuesMarketValueCurrent;
     const totalOtherRevenuesPrev =
       data.dreOtherRevenuesDividendsPrev +
       data.dreOtherRevenuesEquityPickupPrev +
-      data.dreOtherRevenuesFinancialIncomePrev;
+      data.dreOtherRevenuesFinancialIncomePrev +
+      data.dreOtherRevenuesMarketValuePrev;
 
     const totalExpensesCurrent =
       data.dreOperatingExpensesCurrent +
@@ -161,6 +164,7 @@ export default async function handler(req: any, res: any) {
           dividends: { current: data.dreOtherRevenuesDividendsCurrent, previous: data.dreOtherRevenuesDividendsPrev },
           equityPickup: { current: data.dreOtherRevenuesEquityPickupCurrent, previous: data.dreOtherRevenuesEquityPickupPrev },
           financialIncome: { current: data.dreOtherRevenuesFinancialIncomeCurrent, previous: data.dreOtherRevenuesFinancialIncomePrev },
+          marketValue: { current: data.dreOtherRevenuesMarketValueCurrent, previous: data.dreOtherRevenuesMarketValuePrev },
         },
         operatingExpenses: { current: data.dreOperatingExpensesCurrent, previous: data.dreOperatingExpensesPrev },
         otherExpenses: { current: data.dreOtherExpensesCurrent, previous: data.dreOtherExpensesPrev },

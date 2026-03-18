@@ -251,6 +251,10 @@ export const InputForm: React.FC<InputFormProps> = ({
           <input type="number" name="dreOtherRevenuesFinancialIncomeCurrent" placeholder="Atual" value={data.dreOtherRevenuesFinancialIncomeCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
           <input type="number" name="dreOtherRevenuesFinancialIncomePrev" placeholder="Anterior" value={data.dreOtherRevenuesFinancialIncomePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
 
+          <label className="block text-sm col-span-2 pl-2">Valor de Mercado</label>
+          <input type="number" name="dreOtherRevenuesMarketValueCurrent" placeholder="Atual" value={data.dreOtherRevenuesMarketValueCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+          <input type="number" name="dreOtherRevenuesMarketValuePrev" placeholder="Anterior" value={data.dreOtherRevenuesMarketValuePrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Despesas Operacionais</label>
           <input type="number" name="dreOperatingExpensesCurrent" placeholder="Atual" value={data.dreOperatingExpensesCurrent} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
           <input type="number" name="dreOperatingExpensesPrev" placeholder="Anterior" value={data.dreOperatingExpensesPrev} onChange={handleChange} className="block w-full border border-gray-300 rounded px-2 py-1 text-sm" />
