@@ -49,6 +49,8 @@ export const InputForm: React.FC<InputFormProps> = ({
         'liabilityOtherPrev',
         'equityCapitalSocialCurrent',
         'equityCapitalSocialPrev',
+        'equityCapitalToIntegralizeCurrent',
+        'equityCapitalToIntegralizePrev',
         'equityRetainedEarningsUntil2023Current',
         'equityRetainedEarningsUntil2023Prev',
         'equityRetainedEarnings2024Current',
@@ -354,6 +356,10 @@ export const InputForm: React.FC<InputFormProps> = ({
           <label className="block text-sm col-span-2 pl-2">Capital Social</label>
           {renderNumericInput('equityCapitalSocialCurrent', 'Atual')}
           {renderNumericInput('equityCapitalSocialPrev', 'Anterior')}
+
+          <label className="block text-sm col-span-2 pl-2">( - ) Capital Social a Integralizar</label>
+          {renderNumericInput('equityCapitalToIntegralizeCurrent', 'Atual')}
+          {renderNumericInput('equityCapitalToIntegralizePrev', 'Anterior')}
 
           <label className="block text-sm col-span-2 pl-2">Reserva de Lucros</label>
           {renderNumericInput('equityProfitReserveCurrent', 'Atual')}

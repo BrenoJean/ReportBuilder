@@ -47,6 +47,7 @@ const translations = {
     
     shareholderEquity: "SHAREHOLDER'S EQUITY",
     capitalSocial: "Share Capital",
+    capitalToIntegralize: "( - ) Share Capital to Integralize",
     retainedEarningsUntil2023: "Profits and losses until 2023",
     retainedEarnings2024: "Profits and losses 2024",
     retainedEarnings2025: "Profits and losses 2025",
@@ -115,6 +116,7 @@ const translations = {
     
     shareholderEquity: "PATRIMÔNIO LÍQUIDO",
     capitalSocial: "Capital Social",
+    capitalToIntegralize: "( - ) Capital Social a Integralizar",
     retainedEarningsUntil2023: "Lucros e prejuízos até 2023",
     retainedEarnings2024: "Lucros e prejuízos 2024",
     retainedEarnings2025: "Lucros e prejuízos 2025",
@@ -214,6 +216,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
   const netIncomePrev = grossProfitPrev + totalOtherRevenuesPrev - totalExpensesPrev;
 
   const shouldShowCapitalSocial = data.equityCapitalSocialCurrent !== 0 || data.equityCapitalSocialPrev !== 0;
+  const shouldShowCapitalToIntegralize = data.equityCapitalToIntegralizeCurrent !== 0 || data.equityCapitalToIntegralizePrev !== 0;
   const shouldShowRetainedEarningsUntil2023 = data.equityRetainedEarningsUntil2023Current !== 0 || data.equityRetainedEarningsUntil2023Prev !== 0;
   const shouldShowRetainedEarnings2024 = data.equityRetainedEarnings2024Current !== 0 || data.equityRetainedEarnings2024Prev !== 0;
   const shouldShowRetainedEarnings2025 = data.equityRetainedEarnings2025Current !== 0 || data.equityRetainedEarnings2025Prev !== 0;
@@ -430,6 +433,13 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
                 <td className="py-1 pl-4">{t.capitalSocial}</td>
                 <td className="text-right">{formatCurrency(data.equityCapitalSocialCurrent)}</td>
                 {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityCapitalSocialPrev)}</td>}
+              </tr>
+            )}
+            {shouldShowCapitalToIntegralize && (
+              <tr>
+                <td className="py-1 pl-4">{t.capitalToIntegralize}</td>
+                <td className="text-right">{formatCurrency(data.equityCapitalToIntegralizeCurrent)}</td>
+                {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityCapitalToIntegralizePrev)}</td>}
               </tr>
             )}
             {shouldShowProfitReserve && (

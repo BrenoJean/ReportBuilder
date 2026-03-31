@@ -38,6 +38,8 @@ export interface FinancialData {
   // Balance Sheet - Equity
   equityCapitalSocialCurrent: number;
   equityCapitalSocialPrev: number;
+  equityCapitalToIntegralizeCurrent: number;
+  equityCapitalToIntegralizePrev: number;
   equityRetainedEarningsUntil2023Current: number;
   equityRetainedEarningsUntil2023Prev: number;
   equityRetainedEarnings2024Current: number;
@@ -109,6 +111,8 @@ export const INITIAL_DATA: FinancialData = {
   // Equity
   equityCapitalSocialCurrent: 0,
   equityCapitalSocialPrev: 0,
+  equityCapitalToIntegralizeCurrent: 0,
+  equityCapitalToIntegralizePrev: 0,
   equityRetainedEarningsUntil2023Current: 0,
   equityRetainedEarningsUntil2023Prev: 0,
   equityRetainedEarnings2024Current: 0,
