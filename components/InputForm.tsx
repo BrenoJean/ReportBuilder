@@ -51,12 +51,16 @@ export const InputForm: React.FC<InputFormProps> = ({
         'equityCapitalSocialPrev',
         'equityCapitalToIntegralizeCurrent',
         'equityCapitalToIntegralizePrev',
+        'equityCapitalIncreaseFundCurrent',
+        'equityCapitalIncreaseFundPrev',
         'equityRetainedEarningsUntil2023Current',
         'equityRetainedEarningsUntil2023Prev',
         'equityRetainedEarnings2024Current',
         'equityRetainedEarnings2024Prev',
         'equityRetainedEarnings2025Current',
         'equityRetainedEarnings2025Prev',
+        'equityMonetaryConversionAdjustmentCurrent',
+        'equityMonetaryConversionAdjustmentPrev',
         'equityProfitReserveCurrent',
         'equityProfitReservePrev',
         'equityTotalCurrent',
@@ -208,17 +212,21 @@ export const InputForm: React.FC<InputFormProps> = ({
 
   const hasCurrentAnalyticalValues =
     data.equityCapitalSocialCurrent +
+      data.equityCapitalIncreaseFundCurrent +
       data.equityRetainedEarningsUntil2023Current +
       data.equityRetainedEarnings2024Current +
       data.equityRetainedEarnings2025Current +
+      data.equityMonetaryConversionAdjustmentCurrent +
       data.equityProfitReserveCurrent !==
     0;
 
   const hasPrevAnalyticalValues =
     data.equityCapitalSocialPrev +
+      data.equityCapitalIncreaseFundPrev +
       data.equityRetainedEarningsUntil2023Prev +
       data.equityRetainedEarnings2024Prev +
       data.equityRetainedEarnings2025Prev +
+      data.equityMonetaryConversionAdjustmentPrev +
       data.equityProfitReservePrev !==
     0;
 
@@ -361,6 +369,10 @@ export const InputForm: React.FC<InputFormProps> = ({
           {renderNumericInput('equityCapitalToIntegralizeCurrent', 'Atual')}
           {renderNumericInput('equityCapitalToIntegralizePrev', 'Anterior')}
 
+          <label className="block text-sm col-span-2 pl-2">Fundo para Aumento de Capital</label>
+          {renderNumericInput('equityCapitalIncreaseFundCurrent', 'Atual')}
+          {renderNumericInput('equityCapitalIncreaseFundPrev', 'Anterior')}
+
           <label className="block text-sm col-span-2 pl-2">Reserva de Lucros</label>
           {renderNumericInput('equityProfitReserveCurrent', 'Atual')}
           {renderNumericInput('equityProfitReservePrev', 'Anterior')}
@@ -376,6 +388,11 @@ export const InputForm: React.FC<InputFormProps> = ({
           <label className="block text-sm col-span-2 pl-2">Lucros e Prejuízos 2025</label>
           {renderNumericInput('equityRetainedEarnings2025Current', 'Atual')}
           {renderNumericInput('equityRetainedEarnings2025Prev', 'Anterior')}
+
+          <label className="block text-sm col-span-2 pl-2">Ajuste Conversão Monetária <span className="text-xs text-gray-500">(aceita negativo)</span></label>
+          {renderNumericInput('equityMonetaryConversionAdjustmentCurrent', 'Atual')}
+          {renderNumericInput('equityMonetaryConversionAdjustmentPrev', 'Anterior')}
+
           <label className="block text-sm font-bold col-span-2 pl-2">Total do Patrimônio Líquido</label>
           {renderNumericInput('equityTotalCurrent', 'Atual', hasCurrentAnalyticalValues)}
           {renderNumericInput('equityTotalPrev', 'Anterior', hasPrevAnalyticalValues)}

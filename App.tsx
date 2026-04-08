@@ -53,17 +53,21 @@ const App: React.FC = () => {
       const equityAnalyticalCurrentSum =
         next.equityCapitalSocialCurrent +
         (next.equityCapitalToIntegralizeCurrent * -1) +
+        next.equityCapitalIncreaseFundCurrent +
         next.equityRetainedEarningsUntil2023Current +
         next.equityRetainedEarnings2024Current +
         next.equityRetainedEarnings2025Current +
+        next.equityMonetaryConversionAdjustmentCurrent +
         next.equityProfitReserveCurrent;
 
       const equityAnalyticalPrevSum =
         next.equityCapitalSocialPrev +
         (next.equityCapitalToIntegralizePrev * -1) +
+        next.equityCapitalIncreaseFundPrev +
         next.equityRetainedEarningsUntil2023Prev +
         next.equityRetainedEarnings2024Prev +
         next.equityRetainedEarnings2025Prev +
+        next.equityMonetaryConversionAdjustmentPrev +
         next.equityProfitReservePrev;
 
       const hasCurrentAnalyticalValues = equityAnalyticalCurrentSum !== 0;
