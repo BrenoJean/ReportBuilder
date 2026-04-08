@@ -40,12 +40,16 @@ export interface FinancialData {
   equityCapitalSocialPrev: number;
   equityCapitalToIntegralizeCurrent: number;
   equityCapitalToIntegralizePrev: number;
+  equityCapitalIncreaseFundCurrent: number;
+  equityCapitalIncreaseFundPrev: number;
   equityRetainedEarningsUntil2023Current: number;
   equityRetainedEarningsUntil2023Prev: number;
   equityRetainedEarnings2024Current: number;
   equityRetainedEarnings2024Prev: number;
   equityRetainedEarnings2025Current: number;
   equityRetainedEarnings2025Prev: number;
+  equityMonetaryConversionAdjustmentCurrent: number;
+  equityMonetaryConversionAdjustmentPrev: number;
   equityProfitReserveCurrent: number;
   equityProfitReservePrev: number;
   equityTotalCurrent: number;
@@ -113,12 +117,16 @@ export const INITIAL_DATA: FinancialData = {
   equityCapitalSocialPrev: 0,
   equityCapitalToIntegralizeCurrent: 0,
   equityCapitalToIntegralizePrev: 0,
+  equityCapitalIncreaseFundCurrent: 0,
+  equityCapitalIncreaseFundPrev: 0,
   equityRetainedEarningsUntil2023Current: 0,
   equityRetainedEarningsUntil2023Prev: 0,
   equityRetainedEarnings2024Current: 0,
   equityRetainedEarnings2024Prev: 0,
   equityRetainedEarnings2025Current: 0,
   equityRetainedEarnings2025Prev: 0,
+  equityMonetaryConversionAdjustmentCurrent: 0,
+  equityMonetaryConversionAdjustmentPrev: 0,
   equityProfitReserveCurrent: 0,
   equityProfitReservePrev: 0,
   equityTotalCurrent: 0,

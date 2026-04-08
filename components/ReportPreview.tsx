@@ -48,9 +48,11 @@ const translations = {
     shareholderEquity: "SHAREHOLDER'S EQUITY",
     capitalSocial: "Share Capital",
     capitalToIntegralize: "( - ) Share Capital to Integralize",
+    capitalIncreaseFund: "Fund for Capital Increase",
     retainedEarningsUntil2023: "Profits and losses until 2023",
     retainedEarnings2024: "Profits and losses 2024",
     retainedEarnings2025: "Profits and losses 2025",
+    monetaryConversionAdjustment: "Monetary Conversion Adjustment",
     profitReserve: "Profit Reserve",
 
     // Income Statement Labels
@@ -117,9 +119,11 @@ const translations = {
     shareholderEquity: "PATRIMÔNIO LÍQUIDO",
     capitalSocial: "Capital Social",
     capitalToIntegralize: "( - ) Capital Social a Integralizar",
+    capitalIncreaseFund: "Fundo para aumento de capital",
     retainedEarningsUntil2023: "Lucros e prejuízos até 2023",
     retainedEarnings2024: "Lucros e prejuízos 2024",
     retainedEarnings2025: "Lucros e prejuízos 2025",
+    monetaryConversionAdjustment: "Ajuste Conversão Monetária",
     profitReserve: "Reserva de Lucros",
 
     // Income Statement Labels
@@ -159,6 +163,13 @@ const translations = {
 const formatCurrency = (val: number) => {
   if (val === 0 || isNaN(val)) return "-";
   return new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
+};
+
+const formatCurrencyWithParenthesesForNegative = (val: number) => {
+  if (val === 0 || isNaN(val)) return "-";
+  const absoluteValue = Math.abs(val);
+  const formatted = new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(absoluteValue);
+  return val < 0 ? `(${formatted})` : formatted;
 };
 
 export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, printInsights, language }) => {
@@ -217,9 +228,11 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
 
   const shouldShowCapitalSocial = data.equityCapitalSocialCurrent !== 0 || data.equityCapitalSocialPrev !== 0;
   const shouldShowCapitalToIntegralize = data.equityCapitalToIntegralizeCurrent !== 0 || data.equityCapitalToIntegralizePrev !== 0;
+  const shouldShowCapitalIncreaseFund = data.equityCapitalIncreaseFundCurrent !== 0 || data.equityCapitalIncreaseFundPrev !== 0;
   const shouldShowRetainedEarningsUntil2023 = data.equityRetainedEarningsUntil2023Current !== 0 || data.equityRetainedEarningsUntil2023Prev !== 0;
   const shouldShowRetainedEarnings2024 = data.equityRetainedEarnings2024Current !== 0 || data.equityRetainedEarnings2024Prev !== 0;
   const shouldShowRetainedEarnings2025 = data.equityRetainedEarnings2025Current !== 0 || data.equityRetainedEarnings2025Prev !== 0;
+  const shouldShowMonetaryConversionAdjustment = data.equityMonetaryConversionAdjustmentCurrent !== 0 || data.equityMonetaryConversionAdjustmentPrev !== 0;
   const shouldShowProfitReserve = data.equityProfitReserveCurrent !== 0 || data.equityProfitReservePrev !== 0;
   const shouldShowDividends = data.dreOtherRevenuesDividendsCurrent !== 0 || data.dreOtherRevenuesDividendsPrev !== 0;
   const shouldShowEquityPickup = data.dreOtherRevenuesEquityPickupCurrent !== 0 || data.dreOtherRevenuesEquityPickupPrev !== 0;
@@ -442,6 +455,13 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
                 {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityCapitalToIntegralizePrev)}</td>}
               </tr>
             )}
+            {shouldShowCapitalIncreaseFund && (
+              <tr>
+                <td className="py-1 pl-4">{t.capitalIncreaseFund}</td>
+                <td className="text-right">{formatCurrency(data.equityCapitalIncreaseFundCurrent)}</td>
+                {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityCapitalIncreaseFundPrev)}</td>}
+              </tr>
+            )}
             {shouldShowProfitReserve && (
               <tr>
                 <td className="py-1 pl-4">{t.profitReserve}</td>
@@ -468,6 +488,13 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
                 <td className="py-1 pl-4">{t.retainedEarnings2025}</td>
                 <td className="text-right">{formatCurrency(data.equityRetainedEarnings2025Current)}</td>
                 {data.showPrevYear && <td className="text-right">{formatCurrency(data.equityRetainedEarnings2025Prev)}</td>}
+              </tr>
+            )}
+            {shouldShowMonetaryConversionAdjustment && (
+              <tr>
+                <td className="py-1 pl-4">{t.monetaryConversionAdjustment}</td>
+                <td className="text-right">{formatCurrencyWithParenthesesForNegative(data.equityMonetaryConversionAdjustmentCurrent)}</td>
+                {data.showPrevYear && <td className="text-right">{formatCurrencyWithParenthesesForNegative(data.equityMonetaryConversionAdjustmentPrev)}</td>}
               </tr>
             )}
             <tr className="border-t-2 border-black border-b-2 font-bold bg-gray-100">
