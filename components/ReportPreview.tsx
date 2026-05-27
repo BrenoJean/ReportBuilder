@@ -32,7 +32,7 @@ const translations = {
     // Balance Sheet Labels
     assets: "ASSETS",
     cashEquivalents: "Cash and cash equivalents",
-    loansReceivables: "Loans and receivables",
+    loansReceivables: "Loans to shareholders",
     investmentsAssets: "Investments and other financial assets",
     tangibleFixed: "Tangible fixed assets",
     intangibleAssets: "Intangible assets",
@@ -103,7 +103,7 @@ const translations = {
     // Balance Sheet Labels
     assets: "ATIVO",
     cashEquivalents: "Caixa e equivalentes de caixa",
-    loansReceivables: "Empréstimos e recebíveis",
+    loansReceivables: "Empréstimos a Sócios",
     investmentsAssets: "Investimentos e outros ativos financeiros",
     tangibleFixed: "Ativos tangíveis (Imobilizado)",
     intangibleAssets: "Ativos intangíveis",

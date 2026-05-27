@@ -321,7 +321,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           {renderNumericInput('assetCashCurrent', 'Atual')}
           {renderNumericInput('assetCashPrev', 'Anterior')}
           
-          <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Empréstimos e Recebíveis</label>
+          <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Empréstimos a Sócios</label>
           {renderNumericInput('assetLoansCurrent', 'Atual')}
           {renderNumericInput('assetLoansPrev', 'Anterior')}
           
