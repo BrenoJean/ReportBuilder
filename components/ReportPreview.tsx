@@ -34,6 +34,7 @@ const translations = {
     cashEquivalents: "Cash and cash equivalents",
     loansReceivables: "Loans and receivables",
     investmentsAssets: "Investments and other financial assets",
+    borrowings: "Borrowings",
     tangibleFixed: "Tangible fixed assets",
     intangibleAssets: "Intangible assets",
     otherAssets: "Other assets",
@@ -105,6 +106,7 @@ const translations = {
     cashEquivalents: "Caixa e equivalentes de caixa",
     loansReceivables: "Empréstimos e recebíveis",
     investmentsAssets: "Investimentos e outros ativos financeiros",
+    borrowings: "Empréstimos",
     tangibleFixed: "Ativos tangíveis (Imobilizado)",
     intangibleAssets: "Ativos intangíveis",
     otherAssets: "Outros ativos",
@@ -180,6 +182,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
     data.assetCashCurrent + 
     data.assetLoansCurrent + 
     data.assetInvestmentsCurrent + 
+    data.assetBorrowingsCurrent +
     data.assetTangibleCurrent + 
     data.assetIntangibleCurrent + 
     data.assetOtherCurrent;
@@ -188,6 +191,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
     data.assetCashPrev + 
     data.assetLoansPrev + 
     data.assetInvestmentsPrev + 
+    data.assetBorrowingsPrev +
     data.assetTangiblePrev + 
     data.assetIntangiblePrev + 
     data.assetOtherPrev;
@@ -388,6 +392,11 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
               <td className="py-1 pl-4">{t.investmentsAssets}</td>
               <td className="text-right">{formatCurrency(data.assetInvestmentsCurrent)}</td>
               {data.showPrevYear && <td className="text-right">{formatCurrency(data.assetInvestmentsPrev)}</td>}
+            </tr>
+            <tr>
+              <td className="py-1 pl-4">{t.borrowings}</td>
+              <td className="text-right">{formatCurrency(data.assetBorrowingsCurrent)}</td>
+              {data.showPrevYear && <td className="text-right">{formatCurrency(data.assetBorrowingsPrev)}</td>}
             </tr>
             <tr>
               <td className="py-1 pl-4">{t.tangibleFixed}</td>

@@ -35,6 +35,8 @@ export const InputForm: React.FC<InputFormProps> = ({
         'assetLoansPrev',
         'assetInvestmentsCurrent',
         'assetInvestmentsPrev',
+        'assetBorrowingsCurrent',
+        'assetBorrowingsPrev',
         'assetTangibleCurrent',
         'assetTangiblePrev',
         'assetIntangibleCurrent',
@@ -328,6 +330,10 @@ export const InputForm: React.FC<InputFormProps> = ({
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Investimentos e Ativos Financeiros</label>
           {renderNumericInput('assetInvestmentsCurrent', 'Atual')}
           {renderNumericInput('assetInvestmentsPrev', 'Anterior')}
+
+          <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Empréstimos</label>
+          {renderNumericInput('assetBorrowingsCurrent', 'Atual')}
+          {renderNumericInput('assetBorrowingsPrev', 'Anterior')}
           
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Ativos Tangíveis (Imobilizado)</label>
           {renderNumericInput('assetTangibleCurrent', 'Atual')}

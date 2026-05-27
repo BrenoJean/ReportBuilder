@@ -20,6 +20,8 @@ export interface FinancialData {
   assetLoansPrev: number;
   assetInvestmentsCurrent: number;
   assetInvestmentsPrev: number;
+  assetBorrowingsCurrent: number;
+  assetBorrowingsPrev: number;
   assetTangibleCurrent: number;
   assetTangiblePrev: number;
   assetIntangibleCurrent: number;
@@ -97,6 +99,8 @@ export const INITIAL_DATA: FinancialData = {
   assetLoansPrev: 0,
   assetInvestmentsCurrent: 0,
   assetInvestmentsPrev: 0,
+  assetBorrowingsCurrent: 0,
+  assetBorrowingsPrev: 0,
   assetTangibleCurrent: 0,
   assetTangiblePrev: 0,
   assetIntangibleCurrent: 0,

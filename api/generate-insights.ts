@@ -18,6 +18,7 @@ const hasComparablePreviousYear = (data: any) => {
     data.assetCashPrev,
     data.assetLoansPrev,
     data.assetInvestmentsPrev,
+    data.assetBorrowingsPrev,
     data.assetTangiblePrev,
     data.assetIntangiblePrev,
     data.assetOtherPrev,
@@ -93,6 +94,7 @@ export default async function handler(req: any, res: any) {
       data.assetCashCurrent +
       data.assetLoansCurrent +
       data.assetInvestmentsCurrent +
+      data.assetBorrowingsCurrent +
       data.assetTangibleCurrent +
       data.assetIntangibleCurrent +
       data.assetOtherCurrent;
@@ -101,6 +103,7 @@ export default async function handler(req: any, res: any) {
       data.assetCashPrev +
       data.assetLoansPrev +
       data.assetInvestmentsPrev +
+      data.assetBorrowingsPrev +
       data.assetTangiblePrev +
       data.assetIntangiblePrev +
       data.assetOtherPrev;
@@ -154,6 +157,7 @@ export default async function handler(req: any, res: any) {
           cash: { current: data.assetCashCurrent, previous: data.assetCashPrev },
           loans: { current: data.assetLoansCurrent, previous: data.assetLoansPrev },
           investments: { current: data.assetInvestmentsCurrent, previous: data.assetInvestmentsPrev },
+          borrowings: { current: data.assetBorrowingsCurrent, previous: data.assetBorrowingsPrev },
           tangible: { current: data.assetTangibleCurrent, previous: data.assetTangiblePrev },
           intangible: { current: data.assetIntangibleCurrent, previous: data.assetIntangiblePrev },
           other: { current: data.assetOtherCurrent, previous: data.assetOtherPrev },
