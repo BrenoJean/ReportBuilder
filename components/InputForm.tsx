@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FinancialData, Language } from '../types';
+import { FinancialData, Language, OtherCompanyParticipation } from '../types';
 
 interface InputFormProps {
   data: FinancialData;
   language: Language;
   setLanguage: (lang: Language) => void;
   onChange: (field: keyof FinancialData, value: string | number | boolean) => void;
+  onParticipationsChange: (items: OtherCompanyParticipation[]) => void;
   onGenerateInsights: () => void;
   isGenerating: boolean;
   printInsights: boolean;
@@ -14,12 +15,99 @@ interface InputFormProps {
   isPersisting: boolean;
 }
 
+const createParticipationId = () =>
+  (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `participation-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+
+interface ParticipationRowProps {
+  item: OtherCompanyParticipation;
+  onNameChange: (name: string) => void;
+  onValueChange: (field: 'current' | 'prev', value: number) => void;
+  onRemove: () => void;
+}
+
+const ParticipationRow: React.FC<ParticipationRowProps> = ({ item, onNameChange, onValueChange, onRemove }) => {
+  const [currentDraft, setCurrentDraft] = useState<string | null>(null);
+  const [prevDraft, setPrevDraft] = useState<string | null>(null);
+
+  const handleNumericChange = (field: 'current' | 'prev', rawValue: string) => {
+    const normalizedValue = rawValue.replace(',', '.');
+    if (!/^[-]?\d*[.]?\d*$/.test(normalizedValue)) {
+      return;
+    }
+
+    if (field === 'current') {
+      setCurrentDraft(normalizedValue);
+    } else {
+      setPrevDraft(normalizedValue);
+    }
+
+    if (normalizedValue === '' || normalizedValue === '-' || normalizedValue === '.' || normalizedValue === '-.') {
+      onValueChange(field, 0);
+      return;
+    }
+
+    const parsedValue = Number(normalizedValue);
+    if (!Number.isNaN(parsedValue)) {
+      onValueChange(field, parsedValue);
+    }
+  };
+
+  const handleBlur = (field: 'current' | 'prev') => {
+    if (field === 'current') {
+      setCurrentDraft(null);
+    } else {
+      setPrevDraft(null);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-2 gap-2 items-center border-b border-gray-200 pb-2">
+      <div className="col-span-2 flex gap-2 items-center">
+        <input
+          type="text"
+          placeholder="Nome da empresa/subconta"
+          value={item.name}
+          onChange={(e) => onNameChange(e.target.value)}
+          className="block w-full border border-gray-300 rounded px-2 py-1 text-sm"
+        />
+        <button
+          type="button"
+          onClick={onRemove}
+          title="Remover"
+          className="shrink-0 text-red-600 border border-red-300 rounded px-2 py-1 text-xs hover:bg-red-50"
+        >
+          Remover
+        </button>
+      </div>
+      <input
+        type="text"
+        inputMode="decimal"
+        placeholder="Atual"
+        value={currentDraft ?? (item.current === 0 ? '' : String(item.current))}
+        onChange={(e) => handleNumericChange('current', e.target.value)}
+        onBlur={() => handleBlur('current')}
+        className="block w-full border border-gray-300 rounded px-2 py-1 text-sm"
+      />
+      <input
+        type="text"
+        inputMode="decimal"
+        placeholder="Anterior"
+        value={prevDraft ?? (item.prev === 0 ? '' : String(item.prev))}
+        onChange={(e) => handleNumericChange('prev', e.target.value)}
+        onBlur={() => handleBlur('prev')}
+        className="block w-full border border-gray-300 rounded px-2 py-1 text-sm"
+      />
+    </div>
+  );
+};
+
 export const InputForm: React.FC<InputFormProps> = ({ 
   data, 
   language,
   setLanguage,
-  onChange, 
-  onGenerateInsights, 
+  onChange,
+  onParticipationsChange,
+  onGenerateInsights,
   isGenerating,
   printInsights,
   setPrintInsights,
@@ -210,6 +298,24 @@ export const InputForm: React.FC<InputFormProps> = ({
     />
   );
 
+  const participations = data.assetOtherCompanyParticipations;
+
+  const handleAddParticipation = () => {
+    onParticipationsChange([...participations, { id: createParticipationId(), name: '', current: 0, prev: 0 }]);
+  };
+
+  const handleParticipationNameChange = (id: string, name: string) => {
+    onParticipationsChange(participations.map((item) => (item.id === id ? { ...item, name } : item)));
+  };
+
+  const handleParticipationValueChange = (id: string, field: 'current' | 'prev', value: number) => {
+    onParticipationsChange(participations.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
+  };
+
+  const handleRemoveParticipation = (id: string) => {
+    onParticipationsChange(participations.filter((item) => item.id !== id));
+  };
+
   const hasCurrentAnalyticalValues =
     data.equityCapitalSocialCurrent +
       data.equityCapitalIncreaseFundCurrent +
@@ -340,6 +446,30 @@ export const InputForm: React.FC<InputFormProps> = ({
           <label className="block text-sm font-bold col-span-2 bg-gray-50 p-1 mt-2">Outros Ativos</label>
           {renderNumericInput('assetOtherCurrent', 'Atual')}
           {renderNumericInput('assetOtherPrev', 'Anterior')}
+
+          <div className="col-span-2 mt-2">
+            <div className="flex justify-between items-center bg-gray-50 p-1">
+              <label className="block text-sm font-bold">Participação em Outras Empresas</label>
+              <button
+                type="button"
+                onClick={handleAddParticipation}
+                className="shrink-0 text-sm bg-black text-white rounded px-2 py-0.5 hover:bg-gray-800"
+              >
+                + Adicionar
+              </button>
+            </div>
+            <div className="space-y-2 mt-2">
+              {participations.map((item) => (
+                <ParticipationRow
+                  key={item.id}
+                  item={item}
+                  onNameChange={(name) => handleParticipationNameChange(item.id, name)}
+                  onValueChange={(field, value) => handleParticipationValueChange(item.id, field, value)}
+                  onRemove={() => handleRemoveParticipation(item.id)}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { FinancialData, INITIAL_DATA, Language } from './types';
+import { FinancialData, INITIAL_DATA, Language, OtherCompanyParticipation } from './types';
 import { InputForm } from './components/InputForm';
 import { ReportPreview } from './components/ReportPreview';
 import { generateFinancialInsights } from './services/geminiService';
@@ -83,6 +83,10 @@ const App: React.FC = () => {
 
       return next;
     });
+  };
+
+  const handleParticipationsChange = (items: OtherCompanyParticipation[]) => {
+    setData((prev) => ({ ...prev, assetOtherCompanyParticipations: items }));
   };
 
   const handleGenerateInsights = async () => {
@@ -212,7 +216,8 @@ const App: React.FC = () => {
             data={data} 
             language={language}
             setLanguage={handleLanguageChange}
-            onChange={handleDataChange} 
+            onChange={handleDataChange}
+            onParticipationsChange={handleParticipationsChange}
             onGenerateInsights={handleGenerateInsights}
             isGenerating={isGenerating}
             printInsights={printInsights}

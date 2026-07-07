@@ -1,5 +1,12 @@
 export type Language = 'pt' | 'en';
 
+export interface OtherCompanyParticipation {
+  id: string;
+  name: string;
+  current: number;
+  prev: number;
+}
+
 export interface FinancialData {
   companyName: string;
   companyAddress?: string;
@@ -26,7 +33,8 @@ export interface FinancialData {
   assetIntangiblePrev: number;
   assetOtherCurrent: number;
   assetOtherPrev: number;
-  
+  assetOtherCompanyParticipations: OtherCompanyParticipation[];
+
   // Balance Sheet - Liabilities
   liabilityPayablesCurrent: number;
   liabilityPayablesPrev: number;
@@ -103,7 +111,8 @@ export const INITIAL_DATA: FinancialData = {
   assetIntangiblePrev: 0,
   assetOtherCurrent: 0,
   assetOtherPrev: 0,
-  
+  assetOtherCompanyParticipations: [],
+
   // Liabilities
   liabilityPayablesCurrent: 0,
   liabilityPayablesPrev: 0,

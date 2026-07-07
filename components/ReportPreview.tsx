@@ -37,6 +37,7 @@ const translations = {
     tangibleFixed: "Tangible fixed assets",
     intangibleAssets: "Intangible assets",
     otherAssets: "Other assets",
+    otherCompanyParticipations: "Investment in Other Companies",
     totalAssets: "TOTAL ASSETS",
     
     liabilities: "LIABILITIES",
@@ -108,6 +109,7 @@ const translations = {
     tangibleFixed: "Ativos tangíveis (Imobilizado)",
     intangibleAssets: "Ativos intangíveis",
     otherAssets: "Outros ativos",
+    otherCompanyParticipations: "Participação em Outras Empresas",
     totalAssets: "TOTAL DO ATIVO",
     
     liabilities: "PASSIVO",
@@ -176,21 +178,26 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
   const t = translations[language];
 
   // Calculations
-  const totalAssetsCurrent = 
-    data.assetCashCurrent + 
-    data.assetLoansCurrent + 
-    data.assetInvestmentsCurrent + 
-    data.assetTangibleCurrent + 
-    data.assetIntangibleCurrent + 
-    data.assetOtherCurrent;
+  const totalParticipationsCurrent = data.assetOtherCompanyParticipations.reduce((sum, item) => sum + item.current, 0);
+  const totalParticipationsPrev = data.assetOtherCompanyParticipations.reduce((sum, item) => sum + item.prev, 0);
 
-  const totalAssetsPrev = 
-    data.assetCashPrev + 
-    data.assetLoansPrev + 
-    data.assetInvestmentsPrev + 
-    data.assetTangiblePrev + 
-    data.assetIntangiblePrev + 
-    data.assetOtherPrev;
+  const totalAssetsCurrent =
+    data.assetCashCurrent +
+    data.assetLoansCurrent +
+    data.assetInvestmentsCurrent +
+    data.assetTangibleCurrent +
+    data.assetIntangibleCurrent +
+    data.assetOtherCurrent +
+    totalParticipationsCurrent;
+
+  const totalAssetsPrev =
+    data.assetCashPrev +
+    data.assetLoansPrev +
+    data.assetInvestmentsPrev +
+    data.assetTangiblePrev +
+    data.assetIntangiblePrev +
+    data.assetOtherPrev +
+    totalParticipationsPrev;
 
   const totalLiabilitiesCurrent = 
     data.liabilityPayablesCurrent + 
@@ -404,6 +411,21 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ data, insights, pr
               <td className="text-right">{formatCurrency(data.assetOtherCurrent)}</td>
               {data.showPrevYear && <td className="text-right">{formatCurrency(data.assetOtherPrev)}</td>}
             </tr>
+
+            {data.assetOtherCompanyParticipations.length > 0 && (
+              <>
+                <tr>
+                  <td className="py-1 pl-4 font-semibold" colSpan={data.showPrevYear ? 3 : 2}>{t.otherCompanyParticipations}</td>
+                </tr>
+                {data.assetOtherCompanyParticipations.map((item) => (
+                  <tr key={item.id}>
+                    <td className="py-1 pl-8">{item.name}</td>
+                    <td className="text-right">{formatCurrency(item.current)}</td>
+                    {data.showPrevYear && <td className="text-right">{formatCurrency(item.prev)}</td>}
+                  </tr>
+                ))}
+              </>
+            )}
 
              <tr className="border-t-2 border-black border-b-2 font-bold bg-gray-100">
               <td className="py-2">{t.totalAssets}</td>
