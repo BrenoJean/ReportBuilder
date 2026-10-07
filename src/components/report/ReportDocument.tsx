@@ -2,7 +2,7 @@ import React from 'react';
 import { FinancialData, Language } from '../../types';
 import { getStrings, ReportStrings } from '../../lib/i18n';
 import { computeReport, ReportTotals } from '../../lib/calculations';
-import { formatCurrency, formatParensNegative } from '../../lib/format';
+import { formatAmount, formatCurrency, formatParensNegative } from '../../lib/format';
 import { KeepMark, ReportPage } from './ReportPage';
 import { StatementLine, StatementTable } from './StatementTable';
 
@@ -12,6 +12,18 @@ interface ReportDocumentProps {
   insights: string | null;
   printInsights: boolean;
 }
+
+// Mirrors the AI fact sheet: percentages for normal moves, a multiplier for very large ones.
+const formatChange = (current: number, previous: number, language: Language): string | null => {
+  if (previous <= 0 || current < 0) return null;
+  const locale = language === 'pt' ? 'pt-BR' : 'en-US';
+  const ratio = current / previous;
+  if (ratio >= 4) return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(ratio)}×`;
+  const pct = (ratio - 1) * 100;
+  const formatted = new Intl.NumberFormat(locale, { maximumFractionDigits: Math.abs(pct) < 10 ? 1 : 0 }).format(Math.abs(pct));
+  if (formatted === '0') return '0%';
+  return `${pct > 0 ? '▲' : '▼'} ${formatted}%`;
+};
 
 const paren = (v: number) => (v === 0 || Number.isNaN(v) ? '-' : `(${formatCurrency(v)})`);
 
@@ -112,6 +124,18 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ data, language, 
   const r = computeReport(data);
   const hasInsightsPage = Boolean(printInsights && insights?.trim());
   const bsLines = balanceSheetLines(data, r, t);
+  const insightWords = insights?.trim().split(/\s+/).length ?? 0;
+  const insightDensity = insightWords > 340 ? 'dense' : insightWords > 230 ? 'compact' : 'normal';
+  const keyFigures = [
+    { label: t.kpiAssets, current: r.totalAssetsCurrent, prev: r.totalAssetsPrev },
+    { label: t.kpiEquity, current: data.equityTotalCurrent, prev: data.equityTotalPrev },
+    {
+      label: t.kpiRevenues,
+      current: data.dreRevenueCurrent + r.totalOtherRevenuesCurrent,
+      prev: data.dreRevenuePrev + r.totalOtherRevenuesPrev,
+    },
+    { label: r.isNetLoss ? t.kpiNetLoss : t.kpiNetIncome, current: r.netIncomeCurrent, prev: r.netIncomePrev },
+  ].map((kpi) => ({ ...kpi, change: data.showPrevYear ? formatChange(kpi.current, kpi.prev, language) : null }));
   const pageProps = { t, companyName: data.companyName, companyAddress: data.companyAddress };
 
   const contents = [
@@ -224,20 +248,52 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ data, language, 
 
       {hasInsightsPage && (
         <ReportPage {...pageProps} title={t.aiInsights} subtitle={t.aiHeaderSub} pageNumber={6}>
-          <h2 className="text-[13pt] font-semibold border-b border-black pb-[2mm] mb-[5mm]">{t.execSummary}</h2>
-          <div className="text-[10.5pt] leading-[1.7] text-zinc-800 space-y-[4mm] max-w-[160mm]">
+          <p className="text-[8pt] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-[3mm]">{t.keyFigures}</p>
+          <div className={`grid grid-cols-2 gap-[4mm] ${insightDensity === 'normal' ? 'mb-[9mm]' : 'mb-[6mm]'}`}>
+            {keyFigures.map((kpi) => (
+              <div
+                key={kpi.label}
+                className={`border-t-[2pt] border-black bg-zinc-50 px-[4mm] ${insightDensity === 'dense' ? 'pt-[2mm] pb-[2mm]' : 'pt-[3mm] pb-[3.5mm]'}`}
+              >
+                <p className="text-[7.5pt] font-semibold uppercase tracking-[0.12em] text-zinc-500">{kpi.label}</p>
+                <p className="mt-[1.5mm] text-[16pt] font-semibold tnum leading-none">
+                  <span className="text-[9pt] font-medium text-zinc-500 mr-[1mm]">US$</span>
+                  {formatAmount(kpi.current)}
+                </p>
+                <p className={`${insightDensity === 'dense' ? 'mt-[1mm]' : 'mt-[2mm]'} text-[8.5pt] text-zinc-600 tnum min-h-[1em]`}>
+                  {kpi.change ? `${kpi.change} vs. ${data.prevYear}` : ''}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <h2 className={`text-[13pt] font-semibold border-b border-black pb-[2mm] ${insightDensity === 'normal' ? 'mb-[5mm]' : 'mb-[3mm]'}`}>
+            {t.execSummary}
+          </h2>
+          <div
+            lang={language === 'pt' ? 'pt-BR' : 'en'}
+            className={`text-zinc-800 text-justify hyphens-auto ${
+              insightDensity === 'dense'
+                ? 'text-[9.5pt] leading-[1.4] space-y-[1.5mm]'
+                : insightDensity === 'compact'
+                  ? 'text-[10pt] leading-[1.6] space-y-[2.5mm]'
+                  : 'text-[11pt] leading-[1.75] space-y-[3.5mm]'
+            }`}
+          >
             {(insights ?? '')
               .split(/\n\s*\n/)
               .map((paragraph) => paragraph.trim().replace(/US\$ (?=[-\d])/g, 'US$' + '\u00A0'))
               .filter(Boolean)
               .map((paragraph, i) => (
-                <p key={i} className="whitespace-pre-line">
+                <p key={i} className="indent-[8mm] whitespace-pre-line">
                   {paragraph}
                 </p>
               ))}
           </div>
-          <div className="mt-auto pt-[10mm]">
-            <p className="text-[8pt] italic text-zinc-500 bg-zinc-50 border border-zinc-200 p-[4mm]">{t.aiDisclaimer}</p>
+          <div className={`mt-auto ${insightDensity === 'normal' ? 'pt-[10mm]' : 'pt-[4mm]'}`}>
+            <p className={`text-[8pt] italic text-zinc-500 bg-zinc-50 border border-zinc-200 ${insightDensity === 'normal' ? 'p-[4mm]' : 'p-[2.5mm]'}`}>
+              {t.aiDisclaimer}
+            </p>
           </div>
         </ReportPage>
       )}
