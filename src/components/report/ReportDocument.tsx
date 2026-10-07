@@ -225,7 +225,17 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ data, language, 
       {hasInsightsPage && (
         <ReportPage {...pageProps} title={t.aiInsights} subtitle={t.aiHeaderSub} pageNumber={6}>
           <h2 className="text-[13pt] font-semibold border-b border-black pb-[2mm] mb-[5mm]">{t.execSummary}</h2>
-          <div className="text-[10pt] leading-[1.7] text-justify whitespace-pre-line">{insights}</div>
+          <div className="text-[10.5pt] leading-[1.7] text-zinc-800 space-y-[4mm] max-w-[160mm]">
+            {(insights ?? '')
+              .split(/\n\s*\n/)
+              .map((paragraph) => paragraph.trim().replace(/US\$ (?=[-\d])/g, 'US$' + '\u00A0'))
+              .filter(Boolean)
+              .map((paragraph, i) => (
+                <p key={i} className="whitespace-pre-line">
+                  {paragraph}
+                </p>
+              ))}
+          </div>
           <div className="mt-auto pt-[10mm]">
             <p className="text-[8pt] italic text-zinc-500 bg-zinc-50 border border-zinc-200 p-[4mm]">{t.aiDisclaimer}</p>
           </div>
