@@ -1,5 +1,5 @@
 // api/generate-insights.ts
-// Serverless function da Vercel usando Groq (LLaMA 3.3 70B)
+// Serverless function da Vercel usando Groq (GPT-OSS 120B)
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -227,7 +227,7 @@ ${languageInstruction}
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-120b",
         temperature: 0.1,
         messages: [
           {
