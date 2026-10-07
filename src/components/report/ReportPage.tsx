@@ -18,6 +18,7 @@ interface ReportPageProps {
   title?: string;
   subtitle?: string;
   pageNumber?: number;
+  flushTop?: boolean;
   children: React.ReactNode;
 }
 
@@ -28,29 +29,30 @@ export const ReportPage: React.FC<ReportPageProps> = ({
   title,
   subtitle,
   pageNumber,
+  flushTop,
   children,
 }) => (
   <section className="report-page">
-    <header className="bg-black text-white px-[18mm] pt-[12mm] pb-[6mm]">
+    <header className="bg-black text-white px-[18mm] pt-[9mm] pb-[5mm]">
       <div className="flex items-start justify-between gap-6">
         <div className="min-w-0">
-          <p className="text-[15pt] font-semibold leading-tight break-words">{companyName}</p>
+          <p className="text-[14pt] font-semibold leading-tight break-words">{companyName}</p>
           {companyAddress && <p className="text-[8.5pt] text-white/60 mt-1">{companyAddress}</p>}
         </div>
         <KeepMark inverted className="shrink-0 mt-1" />
       </div>
       {title && (
-        <div className="mt-[6mm] border-t border-white/20 pt-[4mm]">
+        <div className="mt-[4mm] border-t border-white/20 pt-[3mm]">
           <p className="text-[11pt] font-medium">{title}</p>
           {subtitle && <p className="text-[8.5pt] text-white/60 mt-0.5">{subtitle}</p>}
         </div>
       )}
     </header>
 
-    <div className="flex-1 px-[18mm] pt-[9mm] pb-[6mm] flex flex-col">{children}</div>
+    <div className={`flex-1 px-[18mm] ${flushTop ? '' : 'pt-[7mm]'} pb-[4mm] flex flex-col`}>{children}</div>
 
-    <footer className="px-[18mm] pb-[10mm]">
-      <div className="flex items-end justify-between border-t border-zinc-300 pt-[3mm] text-[8pt] text-zinc-500">
+    <footer className="px-[18mm] pb-[8mm]">
+      <div className="flex items-end justify-between border-t border-zinc-300 pt-[2.5mm] text-[8pt] text-zinc-500">
         <div>
           <p>{t.preparedBy}</p>
           <p className="font-semibold text-black uppercase tracking-wide">Keep Gestão Contábil</p>

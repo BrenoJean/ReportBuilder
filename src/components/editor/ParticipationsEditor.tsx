@@ -67,7 +67,7 @@ export const ParticipationsEditor: React.FC<ParticipationsEditorProps> = ({ item
                   <IconTrash size={16} />
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2 pl-6">
+              <div className="grid grid-cols-1 gap-2 @[26rem]:grid-cols-2 @[26rem]:pl-6">
                 <MoneyInput
                   value={item.current}
                   onChange={(v) => update(item.id, { current: v })}

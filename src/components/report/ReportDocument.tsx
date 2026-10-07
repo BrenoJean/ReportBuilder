@@ -111,6 +111,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ data, language, 
   const t = getStrings(language);
   const r = computeReport(data);
   const hasInsightsPage = Boolean(printInsights && insights?.trim());
+  const bsLines = balanceSheetLines(data, r, t);
   const pageProps = { t, companyName: data.companyName, companyAddress: data.companyAddress };
 
   const contents = [
@@ -189,15 +190,16 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ data, language, 
       </ReportPage>
 
       {/* Balance sheet */}
-      <ReportPage {...pageProps} title={`2. ${t.finPos}`} subtitle={`${t.asAt} ${data.year} ${t.expressedIn}`} pageNumber={4}>
+      <ReportPage {...pageProps} title={`2. ${t.finPos}`} subtitle={`${t.asAt} ${data.year} ${t.expressedIn}`} pageNumber={4} flushTop>
         <StatementTable
           year={data.year}
           prevYear={data.prevYear}
           showPrev={data.showPrevYear}
           currency={t.currency}
-          lines={balanceSheetLines(data, r, t)}
+          lines={bsLines}
+          dense={bsLines.length > 26}
         />
-        <div className="mt-auto pt-[12mm] flex items-end justify-between gap-6">
+        <div className="mt-auto pt-[8mm] flex items-end justify-between gap-6">
           <p className="text-[8pt] italic text-zinc-500 max-w-[95mm]">{t.disclaimer}</p>
           {data.directorName.trim() && (
             <div className="w-[60mm] border-t border-black pt-[2mm] text-[9pt]">
@@ -209,7 +211,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ data, language, 
       </ReportPage>
 
       {/* Income statement */}
-      <ReportPage {...pageProps} title={`3. ${t.compIncome}`} subtitle={`${t.forYearEnded} ${data.year} ${t.expressedIn}`} pageNumber={5}>
+      <ReportPage {...pageProps} title={`3. ${t.compIncome}`} subtitle={`${t.forYearEnded} ${data.year} ${t.expressedIn}`} pageNumber={5} flushTop>
         <StatementTable
           year={data.year}
           prevYear={data.prevYear}
@@ -217,7 +219,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ data, language, 
           currency={t.currency}
           lines={incomeStatementLines(data, r, t)}
         />
-        <p className="mt-auto pt-[12mm] text-[8pt] italic text-zinc-500">{t.disclaimer}</p>
+        <p className="mt-auto pt-[8mm] text-[8pt] italic text-zinc-500">{t.disclaimer}</p>
       </ReportPage>
 
       {hasInsightsPage && (

@@ -45,9 +45,11 @@ export const MoneyInput: React.FC<MoneyInputProps> = ({ value, onChange, tag, ar
         placeholder="0.00"
         value={display}
         onFocus={(e) => {
-          setDraft(value === 0 ? '' : String(value));
-          const el = e.currentTarget;
-          requestAnimationFrame(() => el.select());
+          // Swap to the raw value in the DOM before selecting so React's re-render keeps the selection.
+          const raw = value === 0 ? '' : String(value);
+          e.currentTarget.value = raw;
+          e.currentTarget.select();
+          setDraft(raw);
         }}
         onChange={(e) => {
           const raw = e.target.value;
@@ -63,7 +65,7 @@ export const MoneyInput: React.FC<MoneyInputProps> = ({ value, onChange, tag, ar
             focusNextMoneyInput(e.currentTarget);
           }
         }}
-        className={`min-w-0 flex-1 h-full bg-transparent pr-3 text-right text-sm tnum outline-none placeholder:text-zinc-300 ${
+        className={`min-w-0 flex-1 h-full bg-transparent pr-3 text-right text-base sm:text-sm tnum outline-none placeholder:text-zinc-300 ${
           value < 0 ? 'text-red-700' : 'text-zinc-900'
         } disabled:cursor-not-allowed disabled:text-zinc-500`}
       />

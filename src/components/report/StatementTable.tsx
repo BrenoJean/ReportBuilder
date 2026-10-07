@@ -13,14 +13,16 @@ interface StatementTableProps {
   showPrev: boolean;
   currency: string;
   lines: StatementLine[];
+  dense?: boolean;
 }
 
 const indentClass = ['pl-0', 'pl-[5mm]', 'pl-[10mm]'];
 
-export const StatementTable: React.FC<StatementTableProps> = ({ year, prevYear, showPrev, currency, lines }) => {
+export const StatementTable: React.FC<StatementTableProps> = ({ year, prevYear, showPrev, currency, lines, dense }) => {
   const cols = showPrev ? 3 : 2;
+  const rowPad = dense ? 'py-[0.55mm]' : 'py-[1mm]';
   return (
-    <table className="w-full text-[9.5pt] border-collapse">
+    <table className={`w-full border-collapse leading-[1.35] ${dense ? 'text-[8.5pt]' : 'text-[9pt]'}`}>
       <colgroup>
         <col />
         <col className="w-[34mm]" />
@@ -28,13 +30,13 @@ export const StatementTable: React.FC<StatementTableProps> = ({ year, prevYear, 
       </colgroup>
       <thead>
         <tr className="border-b-[1.5pt] border-black">
-          <th />
-          <th className="text-right font-semibold pb-[2mm] tnum">
+          <th className="pt-[7mm]" />
+          <th className="text-right font-semibold pt-[7mm] pb-[1.5mm] tnum">
             {year}
             <span className="block text-[7.5pt] font-normal text-zinc-500">{currency}</span>
           </th>
           {showPrev && (
-            <th className="text-right font-semibold pb-[2mm] tnum text-zinc-500">
+            <th className="text-right font-semibold pt-[7mm] pb-[1.5mm] tnum text-zinc-500">
               {prevYear}
               <span className="block text-[7.5pt] font-normal">{currency}</span>
             </th>
@@ -46,7 +48,7 @@ export const StatementTable: React.FC<StatementTableProps> = ({ year, prevYear, 
           if (line.kind === 'heading') {
             return (
               <tr key={i}>
-                <td colSpan={cols} className="pt-[5mm] pb-[1.5mm] text-[8.5pt] font-bold uppercase tracking-[0.08em]">
+                <td colSpan={cols} className={`${dense ? 'pt-[2.5mm]' : 'pt-[3.5mm]'} pb-[1mm] text-[8pt] font-bold uppercase tracking-[0.08em]`}>
                   {line.label}
                 </td>
               </tr>
@@ -55,7 +57,7 @@ export const StatementTable: React.FC<StatementTableProps> = ({ year, prevYear, 
           if (line.kind === 'group') {
             return (
               <tr key={i}>
-                <td colSpan={cols} className="pl-[5mm] pt-[1.5mm] py-[1mm] font-medium">
+                <td colSpan={cols} className={`pl-[5mm] ${rowPad} font-medium`}>
                   {line.label}
                 </td>
               </tr>
@@ -65,7 +67,7 @@ export const StatementTable: React.FC<StatementTableProps> = ({ year, prevYear, 
             const indent = line.indent ?? 1;
             return (
               <tr key={i} className="border-b border-zinc-100">
-                <td className={`py-[1.4mm] pr-4 ${indentClass[indent]} ${indent === 2 ? 'text-zinc-600' : ''}`}>
+                <td className={`${rowPad} pr-4 ${indentClass[indent]} ${indent === 2 ? 'text-zinc-600' : ''}`}>
                   {line.label}
                 </td>
                 <td className="text-right tnum">{line.cur}</td>
@@ -76,7 +78,7 @@ export const StatementTable: React.FC<StatementTableProps> = ({ year, prevYear, 
           if (line.kind === 'subtotal') {
             return (
               <tr key={i} className="font-semibold">
-                <td className="py-[1.8mm] border-t border-black">{line.label}</td>
+                <td className={`${dense ? 'py-[0.9mm]' : 'py-[1.3mm]'} border-t border-black`}>{line.label}</td>
                 <td className="text-right tnum border-t border-black">{line.cur}</td>
                 {showPrev && <td className="text-right tnum border-t border-black">{line.prev}</td>}
               </tr>
@@ -84,7 +86,7 @@ export const StatementTable: React.FC<StatementTableProps> = ({ year, prevYear, 
           }
           return (
             <tr key={i} className="font-bold bg-zinc-100">
-              <td className="py-[2.2mm] pl-[2mm] border-t border-black border-b-[2.5pt] border-b-black border-double">
+              <td className={`${dense ? 'py-[1.1mm]' : 'py-[1.6mm]'} pl-[2mm] border-t border-black border-b-[2.5pt] border-b-black border-double`}>
                 {line.label}
               </td>
               <td className="text-right tnum border-t border-black border-b-[2.5pt] border-b-black border-double">
