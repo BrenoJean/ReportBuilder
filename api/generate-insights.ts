@@ -21,6 +21,9 @@ const hasComparablePreviousYear = (data: any) => {
     data.assetTangiblePrev,
     data.assetIntangiblePrev,
     data.assetOtherPrev,
+    ...(Array.isArray(data.assetOtherCompanyParticipations)
+      ? data.assetOtherCompanyParticipations.map((p: any) => p?.prev)
+      : []),
     data.liabilityPayablesPrev,
     data.liabilityLongTermPrev,
     data.liabilityOtherPrev,
@@ -88,6 +91,11 @@ export default async function handler(req: any, res: any) {
         ? "O texto DEVE ser escrito em Português do Brasil."
         : "The text MUST be written in English (Formal Business English).";
 
+    const participations: Array<{ name?: string; current?: number; prev?: number }> =
+      Array.isArray(data.assetOtherCompanyParticipations) ? data.assetOtherCompanyParticipations : [];
+    const participationsCurrent = participations.reduce((sum, p) => sum + Number(p.current || 0), 0);
+    const participationsPrev = participations.reduce((sum, p) => sum + Number(p.prev || 0), 0);
+
     // Totais para contexto da análise
     const totalAssetsCurrent =
       data.assetCashCurrent +
@@ -95,7 +103,8 @@ export default async function handler(req: any, res: any) {
       data.assetInvestmentsCurrent +
       data.assetTangibleCurrent +
       data.assetIntangibleCurrent +
-      data.assetOtherCurrent;
+      data.assetOtherCurrent +
+      participationsCurrent;
 
     const totalAssetsPrev =
       data.assetCashPrev +
@@ -103,7 +112,8 @@ export default async function handler(req: any, res: any) {
       data.assetInvestmentsPrev +
       data.assetTangiblePrev +
       data.assetIntangiblePrev +
-      data.assetOtherPrev;
+      data.assetOtherPrev +
+      participationsPrev;
 
     const grossProfitCurrent =
       data.dreRevenueCurrent - data.dreCostOfSalesCurrent;
@@ -157,6 +167,10 @@ export default async function handler(req: any, res: any) {
           tangible: { current: data.assetTangibleCurrent, previous: data.assetTangiblePrev },
           intangible: { current: data.assetIntangibleCurrent, previous: data.assetIntangiblePrev },
           other: { current: data.assetOtherCurrent, previous: data.assetOtherPrev },
+          investmentsInOtherCompanies: {
+            total: { current: participationsCurrent, previous: participationsPrev },
+            items: participations.map((p) => ({ name: p.name || "", current: Number(p.current || 0), previous: Number(p.prev || 0) })),
+          },
         },
         liabilities: {
           total: { current: totalLiabilitiesCurrent, previous: totalLiabilitiesPrev },

@@ -1,4 +1,4 @@
-// services/geminiService.ts
+// services/insightsService.ts
 import { FinancialData, Language } from "../types";
 
 export const generateFinancialInsights = async (
