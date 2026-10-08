@@ -258,7 +258,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ data, language, 
                 <p className="text-[7.5pt] font-semibold uppercase tracking-[0.12em] text-zinc-500">{kpi.label}</p>
                 <p className="mt-[1.5mm] text-[16pt] font-semibold tnum leading-none">
                   <span className="text-[9pt] font-medium text-zinc-500 mr-[1mm]">US$</span>
-                  {formatAmount(kpi.current)}
+                  {kpi.current < 0 ? `(${formatAmount(-kpi.current)})` : formatAmount(kpi.current)}
                 </p>
                 <p className={`${insightDensity === 'dense' ? 'mt-[1mm]' : 'mt-[2mm]'} text-[8.5pt] text-zinc-600 tnum min-h-[1em]`}>
                   {kpi.change ? `${kpi.change} vs. ${data.prevYear}` : ''}
